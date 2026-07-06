@@ -25,7 +25,7 @@ test_dir = os.path.join(base_data_path, 'TEST')
 
 ### 2. Dataset Preparation & Augmentation Engine
 
-Uses real-time data generators to scale intensities, apply structural transformations to protect against overfitting, and split training data with a 20% validation anchor:
+Uses real-time data generators to scale intensities, apply structural transformations to protect against overfitting and split training data with a 20% validation anchor:
 
 * **Train Set:** 413 images
 * **Validation Set:** 103 images
@@ -109,16 +109,8 @@ weighted avg       0.97      0.97      0.97       129
 
 ## 🚀 Model Deployment & Single-Image Inference
 
-The framework ships with an integrated, standalone prediction pipeline (`Step 11`) to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically, and visualizes a structural verdict complete with confidence weights.
+The framework ships with an integrated, standalone prediction pipeline (`Step 11`) to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.
 
-```python
-# To execute a standalone diagnostic prediction:
-from tensorflow.keras.models import load_model
-
-model = load_model('PD_CNN_Model.keras')
-predict_parkinson('path_to_unseen_image.png', model)
-
-```
 
 ### Execution Interface Logs
 
@@ -129,7 +121,5 @@ Prediction: Parkinson Detected | Confidence Score: 0.9842
 
 ```
 <img width="389" height="432" alt="image" src="https://github.com/user-attachments/assets/e7a2d36e-d962-41e6-8558-2b984abd2918" />
-
-```
 
 ```
