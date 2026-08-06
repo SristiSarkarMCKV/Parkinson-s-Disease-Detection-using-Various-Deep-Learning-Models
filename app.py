@@ -11,7 +11,7 @@ MODEL_PATH = "PD_CNN_Model.h5"
 if not os.path.exists(MODEL_PATH):
     print("Model weights not found locally. Downloading from cloud storage...")
     # Replace the URL below with your actual direct download link for PD_CNN_Model.h5
-    MODEL_URL = "YOUR_DIRECT_MODEL_DOWNLOAD_URL_HERE"
+    MODEL_URL = "https://huggingface.co/SRISTISARKAR/parkinsons-cnn-model/resolve/main/PD_CNN_Model.h5"
     urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
     print("Model downloaded successfully!")
 
