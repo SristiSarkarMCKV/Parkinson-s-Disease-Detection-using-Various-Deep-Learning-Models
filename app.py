@@ -73,4 +73,4 @@ with gr.Blocks(theme=theme, title="Parkinson's Disease Detection Platform") as d
             )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share=True)
