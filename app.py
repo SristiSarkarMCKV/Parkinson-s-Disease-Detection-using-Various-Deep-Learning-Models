@@ -118,7 +118,7 @@ with gr.Blocks(theme=theme, title="Parkinson's Disease Diagnostic Platform") as 
                     with upload_container:
                         input_img_upload = gr.Image(type="pil", label="Upload Scan Image")
                     
-                    # Sample gallery container (Formatted like Image 3)
+                    # Sample gallery container
                     sample_container = gr.Column(visible=False)
                     with sample_container:
                         gr.Markdown("#### Click a sample image below to load it:")
@@ -177,4 +177,4 @@ with gr.Blocks(theme=theme, title="Parkinson's Disease Diagnostic Platform") as 
             )
 
 if __name__ == "__main__":
-    demo.launch(share=True)
+    demo.launch()
