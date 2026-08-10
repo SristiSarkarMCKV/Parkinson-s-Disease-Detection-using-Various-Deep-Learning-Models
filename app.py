@@ -177,4 +177,4 @@ with gr.Blocks(theme=theme, title="Parkinson's Disease Diagnostic Platform") as 
             )
 
 if __name__ == "__main__":
-    demo.launch(share=True)
+    demo.launch()
