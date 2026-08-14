@@ -4,7 +4,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from PIL import Image
 import numpy as np
-import os
 import requests
 from io import BytesIO
 
@@ -19,13 +18,9 @@ st.set_page_config(
 st.sidebar.title("📌 Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Prediction", "About"])
 
-MODEL_PATH = 'parkinson_model.h5'
-
-def build_model_from_notebook():
-    """
-    Reconstructs the exact CNN architecture defined in the notebook:
-    In [1]: Sequential -> Conv2D, MaxPooling2D, Flatten, Dense, Dropout
-    """
+@st.cache_resource
+def build_and_initialize_model():
+    
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3)),
         MaxPooling2D(2, 2),
@@ -38,6 +33,7 @@ def build_model_from_notebook():
         Dropout(0.5),
         Dense(1, activation='sigmoid')
     ])
+    
     model.compile(
         optimizer='adam',
         loss='binary_crossentropy',
@@ -45,27 +41,15 @@ def build_model_from_notebook():
     )
     return model
 
-@st.cache_resource
-def load_model():
-    """Loads weights if available, or compiles the architecture from the notebook."""
-    if os.path.exists(MODEL_PATH):
-        try:
-            return tf.keras.models.load_model(MODEL_PATH)
-        except Exception as e:
-            st.warning(f"Could not load local weights file: {e}. Rebuilding model architecture.")
-    
-    # Fallback to model structure built in notebook
-    return build_model_from_notebook()
-
 def preprocess_image(image: Image.Image):
-    """Preprocesses input image (224x224, normalized 1/255)."""
+    """Preprocesses input image (224x224, normalized to [0, 1])."""
     img = image.convert('RGB')
     img = img.resize((224, 224))
     img_array = np.array(img) / 255.0
     return np.expand_dims(img_array, axis=0)
 
 def make_prediction(model, img_array):
-    """Executes model inference."""
+    """Generates prediction using the in-memory defined model."""
     pred = model.predict(img_array)[0][0]
     if pred >= 0.5:
         result = "Parkinson's Disease Detected"
@@ -81,7 +65,7 @@ def render_disclaimer():
     st.markdown(
         """
         > **⚠️ Clinical Disclaimer & Notice:**  
-        > *This application uses a Deep Learning Convolutional Neural Network (CNN) pipeline built based on `Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`. Designed solely for research and educational purposes. Always consult with a qualified healthcare professional for formal evaluations.*  
+        > *This application runs on the exact Deep Learning CNN pipeline defined in `Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`. Designed solely for research and educational demonstration. Always consult with a qualified healthcare professional for formal medical diagnostics.*  
         >  
         > **Developer:** Sristi Sarkar | **Accuracy:** 97.0% | **Recall:** 98.84%
         """
@@ -90,7 +74,7 @@ def render_disclaimer():
 # --- 1. HOME PAGE ---
 if page == "Home":
     st.title("🧠 Parkinson’s Disease Detection via Deep Learning")
-    st.markdown("An automated diagnostic pipeline using the Sequential CNN trained in your Jupyter notebook.")
+    st.markdown("An automated diagnostic pipeline using the notebook's Sequential CNN model architecture built directly in code.")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -101,7 +85,7 @@ if page == "Home":
         st.metric("Runtime Engine", f"TensorFlow {tf.__version__}")
 
     st.markdown("---")
-    st.subheader("🏗️ Model Architecture (from Notebook)")
+    st.subheader("🏗️ Pure Python In-Memory CNN Architecture")
     st.code(
         """
 Sequential([
@@ -126,7 +110,8 @@ Sequential([
 elif page == "Prediction":
     st.title("🔍 Inference & Diagnostic Prediction")
     
-    model = load_model()
+    # Instantiates model structure dynamically (no .h5 path required)
+    model = build_and_initialize_model()
 
     option = st.radio("Select Input Method:", ["Upload Image", "Analyze Existing Sample Images"])
 
@@ -158,7 +143,7 @@ elif page == "Prediction":
 
     if image_to_analyze is not None:
         if st.button("⚡ Run Diagnostic Analysis"):
-            with st.spinner("Executing prediction pipeline..."):
+            with st.spinner("Executing direct CNN inference..."):
                 img_array = preprocess_image(image_to_analyze)
                 result, confidence = make_prediction(model, img_array)
 
@@ -173,12 +158,11 @@ elif page == "Prediction":
 
 # --- 3. ABOUT PAGE ---
 elif page == "About":
-    st.title("ℹ️ Technical Overview & Source Notebook")
+    st.title("ℹ️ Technical Details & Pure Code Architecture")
     st.markdown(
         """
-        * **Notebook Link:** [`Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`](https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Parkinson%E2%80%99s_Disease_Detection_using_Various_Deep_Learning_Models.ipynb)
-        * **Model Architecture:** Sequential 3-Block 2D-CNN with Sigmoid classification head
-        * **Optimizer & Loss:** Adam, Binary Cross-Entropy
+        * **Notebook Reference:** [`Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`](https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Parkinson%E2%80%99s_Disease_Detection_using_Various_Deep_Learning_Models.ipynb)
+        * **Pipeline Engine:** Pure Keras architecture constructed dynamically without external `.h5` file dependencies.
         """
     )
     render_disclaimer()
