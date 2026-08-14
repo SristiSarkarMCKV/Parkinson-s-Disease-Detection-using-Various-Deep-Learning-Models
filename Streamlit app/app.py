@@ -27,7 +27,7 @@ def display_disclaimer():
 @st.cache_resource
 def load_keras_model():
     """
-    Builds and reconstructs the custom Sequential CNN model architecture as specified in the project documentation.
+    Builds and reconstructs the custom Sequential CNN model architecture.
     """
     model = tf.keras.models.Sequential([
         tf.keras.layers.Input(shape=(224, 224, 3)),
@@ -42,7 +42,7 @@ def load_keras_model():
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
-    model.compile(optimizer='adam', loss='binary_cross_entropy', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 # Image Processing Function
@@ -97,7 +97,7 @@ if page == "Home":
     * **High Diagnostic Safety:** Specifically optimized for high positive case recall (98.84%) to minimize dangerous False Negatives.
     * **Custom CNN Pipeline:** Multi-stage 2D Convolutional layers with dropout regularization.
     * **Real-time Evaluation:** Supports single-image inference via custom uploads or predefined repository cohorts.
-    * **Modern Tech Stack:** Native implementation using Python 3.12 and TensorFlow 2.19.0 runtime.
+    * **Modern Tech Stack:** Native implementation using Python 3 and TensorFlow CPU runtime.
     """)
     
     display_disclaimer()
@@ -174,7 +174,7 @@ elif page == "About":
     * **Layer 2:** Conv2D (64 filters, 3x3, ReLU) ➞ MaxPooling2D (2x2)
     * **Layer 3:** Conv2D (128 filters, 3x3, ReLU) ➞ MaxPooling2D (2x2)
     * **Classification Head:** Flatten (86,528 features) ➞ Dense (128, ReLU) ➞ Dropout (0.5) ➞ Dense (1, Sigmoid)
-    * **Total Parameters:** 11,169,089 (42.61 MB)
+    * **Total Parameters:** 11,169,089
     """)
     
     st.markdown("---")
