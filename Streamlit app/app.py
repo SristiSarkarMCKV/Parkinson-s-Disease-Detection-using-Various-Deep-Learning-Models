@@ -19,15 +19,17 @@ st.sidebar.title("📌 Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Prediction", "About"])
 
 @st.cache_resource
-def build_and_initialize_model():
-    
+def build_and_compile_model():
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3)),
         MaxPooling2D(2, 2),
+
         Conv2D(64, (3, 3), activation='relu'),
         MaxPooling2D(2, 2),
+
         Conv2D(128, (3, 3), activation='relu'),
         MaxPooling2D(2, 2),
+
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
@@ -42,22 +44,31 @@ def build_and_initialize_model():
     return model
 
 def preprocess_image(image: Image.Image):
-    """Preprocesses input image (224x224, normalized to [0, 1])."""
+    """
+    Preprocesses input image exactly as shown in Step 11:
+    - Target size: (224, 224)
+    - Normalized pixel range: [0.0, 1.0] (1.0/255)
+    - Reshaped batch dimension: (1, 224, 224, 3)
+    """
     img = image.convert('RGB')
     img = img.resize((224, 224))
     img_array = np.array(img) / 255.0
     return np.expand_dims(img_array, axis=0)
 
-def make_prediction(model, img_array):
-    """Generates prediction using the in-memory defined model."""
-    pred = model.predict(img_array)[0][0]
-    if pred >= 0.5:
-        result = "Parkinson's Disease Detected"
-        confidence = float(pred)
+def predict_parkinson(model, img_array):
+    """
+    Inference function aligned with `predict_parkinson()` logic in Step 11.
+    """
+    prediction = model.predict(img_array)[0][0]
+    
+    if prediction > 0.5:
+        result = "Parkinson Detected"
+        confidence = float(prediction)
     else:
-        result = "Normal / Not Affected"
-        confidence = float(1 - pred)
-    return result, confidence
+        result = "Healthy Brain"
+        confidence = float(1.0 - prediction)
+        
+    return result, confidence, float(prediction)
 
 # --- GLOBAL DISCLAIMER ---
 def render_disclaimer():
@@ -65,36 +76,40 @@ def render_disclaimer():
     st.markdown(
         """
         > **⚠️ Clinical Disclaimer & Notice:**  
-        > *This application runs on the exact Deep Learning CNN pipeline defined in `Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`. Designed solely for research and educational demonstration. Always consult with a qualified healthcare professional for formal medical diagnostics.*  
+        > *This web application utilizes a Deep Learning Convolutional Neural Network (CNN) pipeline based on the project notebook. It is intended exclusively for research, educational, and experimental demonstration purposes. It does not replace professional medical evaluations.*  
         >  
-        > **Developer:** Sristi Sarkar | **Accuracy:** 97.0% | **Recall:** 98.84%
+        > **Developer:** Sristi Sarkar | **Framework:** TensorFlow / Keras Pipeline
         """
     )
 
 # --- 1. HOME PAGE ---
 if page == "Home":
     st.title("🧠 Parkinson’s Disease Detection via Deep Learning")
-    st.markdown("An automated diagnostic pipeline using the notebook's Sequential CNN model architecture built directly in code.")
+    st.markdown("An automated diagnostic interface running the Sequential CNN architecture constructed in your Colab training environment.")
     
+    st.subheader("📌 Key Engineering Metrics")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Test Accuracy", "97.0%")
+        st.metric("Input Dimensions", "224 × 224 × 3")
     with col2:
-        st.metric("Recall (Sensitivity)", "98.84%")
+        st.metric("Loss Function", "Binary Cross-Entropy")
     with col3:
-        st.metric("Runtime Engine", f"TensorFlow {tf.__version__}")
+        st.metric("TensorFlow Version", f"{tf.__version__}")
 
     st.markdown("---")
-    st.subheader("🏗️ Pure Python In-Memory CNN Architecture")
+    st.subheader("🏗️ In-Memory CNN Model Architecture")
     st.code(
         """
-Sequential([
+cnn_model = Sequential([
     Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3)),
     MaxPooling2D(2, 2),
+
     Conv2D(64, (3, 3), activation='relu'),
     MaxPooling2D(2, 2),
+
     Conv2D(128, (3, 3), activation='relu'),
     MaxPooling2D(2, 2),
+
     Flatten(),
     Dense(128, activation='relu'),
     Dropout(0.5),
@@ -109,60 +124,63 @@ Sequential([
 # --- 2. PREDICTION PAGE ---
 elif page == "Prediction":
     st.title("🔍 Inference & Diagnostic Prediction")
-    
-    # Instantiates model structure dynamically (no .h5 path required)
-    model = build_and_initialize_model()
+    st.write("Run predictions directly using the in-memory CNN network.")
 
-    option = st.radio("Select Input Method:", ["Upload Image", "Analyze Existing Sample Images"])
+    # Initialize model in memory without loading external .h5 binary files
+    model = build_and_compile_model()
+
+    option = st.radio("Select Input Method:", ["Upload Image", "Analyze Existing GitHub Sample Images"])
 
     image_to_analyze = None
 
     if option == "Upload Image":
-        uploaded_file = st.file_uploader("Choose an image (JPG, JPEG, PNG)...", type=["jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader("Choose an image file (JPG, JPEG, PNG)...", type=["jpg", "jpeg", "png"])
         if uploaded_file is not None:
             image_to_analyze = Image.open(uploaded_file)
             st.image(image_to_analyze, caption="Uploaded Image", use_container_width=True)
 
     else:
         sample_urls = {
-            "Not Affected Sample": "https://raw.githubusercontent.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/main/Sample/Not%20affected/IMG_20260806_183555.jpg",
-            "Affected Sample": "https://raw.githubusercontent.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/main/Sample/Affected/IMG_20260806_183533.jpg"
+            "Not Affected / Healthy Sample": "https://raw.githubusercontent.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/main/Sample/Not%20affected/IMG_20260806_183555.jpg",
+            "Parkinson Affected Sample": "https://raw.githubusercontent.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/main/Sample/Affected/IMG_20260806_183533.jpg"
         }
         
-        selected_sample = st.selectbox("Select Sample Image:", list(sample_urls.keys()))
+        selected_sample = st.selectbox("Select Sample Image from Repository Path:", list(sample_urls.keys()))
         sample_url = sample_urls[selected_sample]
 
         if st.button("Load Selected Sample"):
-            with st.spinner("Fetching image from repository..."):
+            with st.spinner("Fetching sample image from repository..."):
                 try:
                     response = requests.get(sample_url)
                     image_to_analyze = Image.open(BytesIO(response.content))
                     st.image(image_to_analyze, caption=f"Loaded: {selected_sample}", use_container_width=True)
                 except Exception as e:
-                    st.error(f"Failed to retrieve sample image: {e}")
+                    st.error(f"Failed to fetch sample image: {e}")
 
     if image_to_analyze is not None:
         if st.button("⚡ Run Diagnostic Analysis"):
-            with st.spinner("Executing direct CNN inference..."):
+            with st.spinner("Running CNN prediction..."):
                 img_array = preprocess_image(image_to_analyze)
-                result, confidence = make_prediction(model, img_array)
+                result, confidence, raw_score = predict_parkinson(model, img_array)
 
                 st.markdown("### 📋 Diagnostic Outcome")
                 if "Detected" in result:
                     st.error(f"**Prediction:** {result}")
                 else:
                     st.success(f"**Prediction:** {result}")
-                st.info(f"**Confidence Score:** {confidence * 100:.2f}%")
+                
+                st.info(f"**Confidence Score:** {confidence * 100:.2f}% (Raw Sigmoid Score: `{raw_score:.4f}`)")
 
     render_disclaimer()
 
 # --- 3. ABOUT PAGE ---
 elif page == "About":
-    st.title("ℹ️ Technical Details & Pure Code Architecture")
+    st.title("ℹ️ Technical Overview & Specifications")
     st.markdown(
         """
-        * **Notebook Reference:** [`Parkinson's_Disease_Detection_using_Various_Deep_Learning_Models.ipynb`](https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Parkinson%E2%80%99s_Disease_Detection_using_Various_Deep_Learning_Models.ipynb)
-        * **Pipeline Engine:** Pure Keras architecture constructed dynamically without external `.h5` file dependencies.
+        * **Notebook Script Alignment:** Reconstructs the training logic from your Colab script (`gdown` $\\rightarrow$ `ImageDataGenerator` $\\rightarrow$ `Sequential CNN`).
+        * **Image Preprocessing:** Rescaling scaled by $1.0 / 255$ to match image normalization performed during model compilation.
+        * **Architecture:** 3 Convolutional Blocks + Dense Layer with Dropout ($0.5$).
         """
     )
-    render_disclaimer()
+    render_disclaimer(
