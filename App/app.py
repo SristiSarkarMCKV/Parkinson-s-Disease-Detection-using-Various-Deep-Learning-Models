@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # Background GIF showing brain scans and neurological technology
-PERMANENT_BG_GIF = "https://media2.giphy.com/media/v1.Y2lksetItemzZjMDliOTUyemhtNmVzYTdldnp1endmNXRheTBzcHIyc2h0cG5xcHoxdXFyOXFiOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xRGuaM7FFZSZq/giphy.gif"
+PERMANENT_BG_GIF = "https://giphy.com/gifs/trippy-brain-mri-38tjCITcNUmWc"
 
 def inject_custom_styles(bg_url):
     css = (
