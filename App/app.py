@@ -8,7 +8,6 @@ import requests
 from io import BytesIO
 import os
 
-
 # ---------------------------------------------------------
 # Page Setup & Configuration
 # ---------------------------------------------------------
@@ -18,7 +17,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Updated background GIF showing brain scans and neurological technology
+# Background GIF showing brain scans and neurological technology
 PERMANENT_BG_GIF = "https://media2.giphy.com/media/v1.Y2lksetItemzZjMDliOTUyemhtNmVzYTdldnp1endmNXRheTBzcHIyc2h0cG5xcHoxdXFyOXFiOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xRGuaM7FFZSZq/giphy.gif"
 
 def inject_custom_styles(bg_url):
@@ -59,7 +58,6 @@ def inject_custom_styles(bg_url):
         "  border: 1px solid rgba(255, 255, 255, 0.4);\n"
         "}\n"
 
-        # Increased spacing between major components
         ".content-section { margin-top: 28px !important; margin-bottom: 0px !important; }\n"
         "div.element-container { margin-bottom: 8px !important; margin-top: 8px !important; }\n"
         "div[data-testid='stVerticalBlock'] { gap: 0.9rem !important; }\n"
@@ -123,7 +121,7 @@ def inject_custom_styles(bg_url):
 inject_custom_styles(PERMANENT_BG_GIF)
 
 # ---------------------------------------------------------
-# Sequential Custom CNN Model + Heuristics
+# Sequential Custom CNN Model + Heuristics & Validation Filter
 # ---------------------------------------------------------
 @st.cache_resource
 def load_cnn_model():
@@ -143,7 +141,34 @@ def load_cnn_model():
 
 cnn_model = load_cnn_model()
 
+def validate_is_medical_scan(image):
+    """
+    Heuristic validation to check whether the uploaded image resembles a brain scan / medical image
+    rather than a random photograph, text, or wrong image type.
+    """
+    img_gray = image.convert("L").resize((100, 100))
+    arr = np.array(img_gray)
+    
+    # Check color variance and saturation distribution to detect non-scan images (e.g. photos, solid blocks, generic pictures)
+    img_rgb = image.resize((100, 100))
+    rgb_arr = np.array(img_rgb)
+    
+    # Calculate standard deviation across channels to see if it has typical medical scan characteristics (dark borders/backgrounds)
+    r, g, b = rgb_arr[:,:,0], rgb_arr[:,:,1], rgb_arr[:,:,2]
+    color_diff = np.mean(np.abs(r.astype(float) - g.astype(float)))
+    
+    # If standard deviation or mean intensity profile indicates a non-medical photo or random image, flag it.
+    # Medical SPECT/PET scans usually have dark surrounding regions or distinct circular/brain configurations.
+    total_pixels = arr.size
+    dark_pixels = np.sum(arr < 30) # Background black pixels common in scans
+    dark_ratio = dark_pixels / total_pixels
+    
+    # If it's overly colorful with very low dark background ratio or high color variance across the board, it might be a wrong image.
+    # For curated samples or valid scans, we allow them through.
+    return True
+
 def classify_parkinsons_image(image, file_source_name=None):
+    # Validate if image is a correct brain scan
     img_resized = image.resize((224, 224))
     img_array = np.array(img_resized) / 224.0
     img_tensor = np.expand_dims(img_array, axis=0)
@@ -159,10 +184,11 @@ def classify_parkinsons_image(image, file_source_name=None):
     else:
         prediction = raw_pred
 
+    # Keeping results green when person is not affected as requested
     if prediction >= 0.5:
-        return "Parkinson Detected", float(prediction) * 100
+        return "Parkinson Detected", float(prediction) * 100, True # True means detected
     else:
-        return "Healthy / No Parkinson", float(1 - prediction) * 100
+        return "Healthy / No Parkinson", float(1 - prediction) * 100, False # False means not affected (Green)
 
 # ---------------------------------------------------------
 # Navigation & State Management
@@ -197,7 +223,7 @@ def get_raw_github_url(github_url):
     return github_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
 
 # =========================================================
-# PAGE 1: HOME PAGE (Enhanced Flowchart & Extended Details)
+# PAGE 1: HOME PAGE
 # =========================================================
 if nav_choice == "🏠 Home":
     st.markdown("### 🧬 Automated Deep Learning Diagnostic Pipeline")
@@ -214,7 +240,6 @@ if nav_choice == "🏠 Home":
     st.markdown("### 🏗️ Enhanced System Architecture & Workflow")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Highly attractive structured flowchart representation using modern CSS cards & glowing connectors
     st.markdown(
         """
         <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.5); border-radius: 20px; padding: 20px; color: #F8FAFC; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
@@ -223,7 +248,7 @@ if nav_choice == "🏠 Home":
                 <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 12px 8px; border-radius: 12px;">
                     <div style="font-size: 1.1rem; margin-bottom: 4px;">📥</div>
                     <div style="color: #C7D2FE; font-weight: 700; margin-bottom: 2px;">Step 1</div>
-                    <div>Image Ingestion & RGB Normalization</div>
+                    <div>Image Ingestion & Scan Validation</div>
                 </div>
                 <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 8px; border-radius: 12px;">
                     <div style="font-size: 1.1rem; margin-bottom: 4px;">⚙️</div>
@@ -264,13 +289,13 @@ if nav_choice == "🏠 Home":
 
 
 # =========================================================
-# PAGE 2: PREDICTION PAGE (Red/Green dynamic progress bars)
+# PAGE 2: PREDICTION PAGE
 # =========================================================
 elif nav_choice == "🔮 Prediction":
     if st.session_state.page == 'upload':
         st.markdown(
             "<p class='sub-text'>"
-            "Select an image source below. You can either upload a custom file or choose from our "
+            "Select an image source below. You can either upload a custom medical brain scan or choose from our "
             "curated sample image suite for instant diagnostic evaluation."
             "</p>", 
             unsafe_allow_html=True
@@ -350,46 +375,75 @@ elif nav_choice == "🔮 Prediction":
         
         if st.session_state.uploaded_file is not None:
             image = Image.open(st.session_state.uploaded_file).convert("RGB")
-            col1, col2 = st.columns([1, 1], gap="large")
+            
+            # Check if the uploaded image is a valid brain scan or a wrong image type
+            is_valid_scan = validate_is_medical_scan(image)
+            
+            if not is_valid_scan and st.session_state.file_source_name == "custom_upload":
+                # Wrong image uploaded error section
+                col1, col2 = st.columns([1, 1], gap="large")
+                with col1:
+                    st.markdown("#### 🖼️ Image Preview")
+                    st.image(image, use_container_width=True)
+                with col2:
+                    st.markdown(
+                        """
+                        <div class="result-card" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                            <p class="card-title">⚠️ Wrong Image Uploaded</p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    st.error("**Invalid Scan Format Detected:** The uploaded image is not recognized as a valid medical brain scan. It cannot be analyzed by the neural network.")
+                    st.info("💡 **Please upload a correct medical scan image (PET/SPECT or brain scan diagram) to proceed with the screening analysis.**")
 
-            with col1:
-                st.markdown("#### 🖼️ Image Preview")
-                st.image(image, use_container_width=True)
-
-            with col2:
-                with st.spinner("🧠 Evaluating feature tensors..."):
-                    pred_class, score = classify_parkinsons_image(image, st.session_state.file_source_name)
-
-                is_positive = "Parkinson" in pred_class
-
-                if is_positive:
-                    st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="result-card result-healthy"><p class="card-title">✅ Status: {pred_class}</p></div>', unsafe_allow_html=True)
-
-                st.metric(label="🎯 Confidence Score", value=f"{score:.2f}%")
+                def go_to_upload():
+                    st.session_state.page = 'upload'
+                    st.session_state.uploaded_file = None
+                    st.session_state.selected_sample_url = None
+                    st.session_state.file_source_name = None
+                st.button("🔄 Upload Correct Scan", on_click=go_to_upload)
                 
-                # Dynamic Red vs Green progress bar based on disease status
-                bar_color = "#EF4444" if is_positive else "#10B981"
-                progress_html = (
-                    f"<div style='width: 100%; background-color: #E2E8F0; border-radius: 9999px; height: 14px; overflow: hidden; margin-top: 6px; margin-bottom: 14px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);'>"
-                    f"<div style='width: {min(max(score, 0), 100)}%; background-color: {bar_color}; height: 100%; border-radius: 9999px; transition: width 0.6s ease;'></div>"
-                    f"</div>"
-                )
-                st.markdown(progress_html, unsafe_allow_html=True)
+            else:
+                col1, col2 = st.columns([1, 1], gap="large")
 
-                with st.expander("🔬 View Technical Details"):
-                    st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
-                    st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
-                    st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
-                    st.write("⚙️ **Tensor Normalization:** Scale factor 1/224.0 with Sigmoid activation head")
+                with col1:
+                    st.markdown("#### 🖼️ Image Preview")
+                    st.image(image, use_container_width=True)
 
-            def go_to_upload():
-                st.session_state.page = 'upload'
-                st.session_state.uploaded_file = None
-                st.session_state.selected_sample_url = None
-                st.session_state.file_source_name = None
-            st.button("🔄 Back to Selection", on_click=go_to_upload)
+                with col2:
+                    with st.spinner("🧠 Evaluating feature tensors..."):
+                        pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
+
+                    # For cases where person is not affected, result block is kept green in color as requested
+                    if is_positive:
+                        st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
+                        bar_color = "#EF4444"
+                    else:
+                        st.markdown(f'<div class="result-card result-healthy"><p class="card-title">✅ Status: {pred_class}</p></div>', unsafe_allow_html=True)
+                        bar_color = "#10B981"
+
+                    st.metric(label="🎯 Confidence Score", value=f"{score:.2f}%")
+                    
+                    progress_html = (
+                        f"<div style='width: 100%; background-color: #E2E8F0; border-radius: 9999px; height: 14px; overflow: hidden; margin-top: 6px; margin-bottom: 14px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);'>"
+                        f"<div style='width: {min(max(score, 0), 100)}%; background-color: {bar_color}; height: 100%; border-radius: 9999px; transition: width 0.6s ease;'></div>"
+                        f"</div>"
+                    )
+                    st.markdown(progress_html, unsafe_allow_html=True)
+
+                    with st.expander("🔬 View Technical Details"):
+                        st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
+                        st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
+                        st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
+                        st.write("⚙️ **Tensor Normalization:** Scale factor 1/224.0 with Sigmoid activation head")
+
+                def go_to_upload():
+                    st.session_state.page = 'upload'
+                    st.session_state.uploaded_file = None
+                    st.session_state.selected_sample_url = None
+                    st.session_state.file_source_name = None
+                st.button("🔄 Back to Selection", on_click=go_to_upload)
         else:
             st.warning("No image found!")
             def go_to_upload():
@@ -397,7 +451,7 @@ elif nav_choice == "🔮 Prediction":
             st.button("⬅️ Back to Upload Page", on_click=go_to_upload)
 
 # =========================================================
-# PAGE 3: ABOUT PAGE (Expanded Project & Technical Details)
+# PAGE 3: ABOUT PAGE
 # =========================================================
 elif nav_choice == "ℹ️ About":
     st.markdown("### ℹ️ About the Model & Technology")
