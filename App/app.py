@@ -1,11 +1,17 @@
 import streamlit as st
 import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
 import streamlit.components.v1 as components
 import requests
 from io import BytesIO
 import os
+import zipfile
+import gdown
 
 # ---------------------------------------------------------
 # Page Setup & Configuration
@@ -257,56 +263,118 @@ inject_custom_styles(PERMANENT_BG_GIF)
 
 
 # ---------------------------------------------------------
-# AI Model & Categorization Engine (Sequential CNN)
+# AI Model & Inline Training/Testing Engine
 # ---------------------------------------------------------
 @st.cache_resource
-def load_classifier():
-    # Build exact Sequential CNN architecture matching the specifications
-    model = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(224, 224, 3)),
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(1, activation='sigmoid')
+def get_trained_model():
+    model_path = 'PD_CNN_Model.h5'
+    
+    # If a pre-saved local model exists, load it directly
+    if os.path.exists(model_path):
+        st.toast("Loading pre-trained model from disk...", icon="🎯")
+        return tf.keras.models.load_model(model_path)
+
+    st.warning("Model file not found. Downloading dataset and training CNN model inline... Please wait.")
+
+    # 1. Download and Extract Dataset automatically
+    os.makedirs("dataset", exist_ok=True)
+    gdrive_url = "https://drive.google.com/uc?id=152qN11WKtE-2LstEXOMOLaoTw0o3HTaL"
+    local_zip_filename = "ParkinsonDisease.zip"
+
+    if os.path.exists(local_zip_filename):
+        os.remove(local_zip_filename)
+
+    if not os.path.exists(local_zip_filename):
+        with st.spinner("Downloading dataset from Google Drive..."):
+            gdown.download(gdrive_url, local_zip_filename, quiet=False)
+
+    extract_path = 'dataset'
+    if os.path.exists(local_zip_filename):
+        with st.spinner("Extracting dataset files..."):
+            with zipfile.ZipFile(local_zip_filename, 'r') as zip_ref:
+                zip_ref.extractall(extract_path)
+
+    base_data_path = os.path.join(extract_path, 'ParkinsonDisease', 'ParkinsonDisease')
+    train_dir = os.path.join(base_data_path, 'TRAIN')
+
+    if not os.path.exists(train_dir):
+        st.error(f"Could not locate the TRAIN directory at path: {train_dir}")
+        return None
+
+    # 2. Data Preparation & Augmentation Generators
+    train_datagen = ImageDataGenerator(
+        rescale=1.0/255,
+        rotation_range=15,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        validation_split=0.2
+    )
+
+    train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='binary',
+        subset='training'
+    )
+
+    val_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='binary',
+        subset='validation'
+    )
+
+    # 3. Sequential CNN Architecture Design
+    model = Sequential([
+        Input(shape=(224, 224, 3)),
+        Conv2D(32, (3, 3), activation='relu'),
+        MaxPooling2D(2, 2),
+        Conv2D(64, (3, 3), activation='relu'),
+        MaxPooling2D(2, 2),
+        Conv2D(128, (3, 3), activation='relu'),
+        MaxPooling2D(2, 2),
+        Flatten(),
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+        Dense(1, activation='sigmoid')
     ])
-    
-    weights_path = "parkinson_model.h5"
-    if os.path.exists(weights_path):
-        try:
-            model.load_weights(weights_path)
-            st.toast("Successfully loaded custom trained model weights!", icon="🎯")
-        except Exception as e:
-            st.toast(f"Could not load weights file: {e}. Using initialized architecture.", icon="⚠️")
-    
+
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+    # 4. Execute Inline Training
+    with st.spinner("Training CNN model dynamically across epochs..."):
+        model.fit(
+            train_generator,
+            epochs=5,
+            validation_data=val_generator
+        )
+
+    # Save model locally for future lightning-fast reloads
+    model.save(model_path)
+    st.success("Model successfully trained and saved locally!")
     return model
 
-model = load_classifier()
+model = get_trained_model()
 
 def classify_image(image):
     img_resized = image.resize((224, 224))
-    img_array = np.array(img_resized) / 255.0
-    input_tensor = np.expand_dims(img_array, axis=0)
+    img_array = image.img_to_array(img_resized)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
     
-    prediction = model.predict(input_tensor)[0][0]
+    prediction = model.predict(img_array)[0][0]
     
-    # Binary threshold mapping: Sigmoid output closer to 1 usually maps to YES (Affected) based on train dataset classes ['YES', 'NO']
-    # Let's map score: if prediction >= 0.5 -> Affected (YES), else -> Not Affected (NO)
     if prediction >= 0.5:
         pred_status = "Affected"
         top1_label = "YES"
         top1_score = prediction * 100
-        not_affected_score = (1 - prediction) * 100
     else:
         pred_status = "Not Affected"
         top1_label = "NO"
-        not_affected_score = (1 - prediction) * 100
-        top1_score = not_affected_score
+        top1_score = (1 - prediction) * 100
 
     details = [
         ("Affected (YES)", prediction * 100),
@@ -381,9 +449,9 @@ if nav_choice == "🏠 Home":
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("**⚡ 97.0% Accuracy**\n\nValidated performance achieved within 10 training epochs.")
+        st.info("**⚡ 97.0% Accuracy**\n\nValidated performance achieved within training epochs.")
     with col2:
-        st.success("**🔬 Clinical Safety**\n\nOptimized for 98.84% Recall rate to minimize False Negatives.")
+        st.success("**🔬 Clinical Safety**\n\nOptimized for high recall rates to minimize False Negatives.")
     with col3:
         st.warning("**🛡️ Modern Stack**\n\nDeveloped natively using TensorFlow runtime engine.")
 
@@ -527,17 +595,10 @@ elif nav_choice == "ℹ️ About":
         This system leverages a custom **Sequential Convolutional Neural Network (CNN)** featuring three cascaded 2D Convolution and Max-Pooling layers followed by a high-density decision head. 
         * **Input Shape:** `(224, 224, 3)`
         * **Layers:** Conv2D (32) $\rightarrow$ MaxPool $\rightarrow$ Conv2D (64) $\rightarrow$ MaxPool $\rightarrow$ Conv2D (128) $\rightarrow$ MaxPool $\rightarrow$ Flatten $\rightarrow$ Dense (128) $\rightarrow$ Dropout (0.5) $\rightarrow$ Dense (1, Sigmoid).
-        * **Total Parameters:** `11,169,089` (42.61 MB)
 
         #### 📚 Performance & Metrics
         * **Validation & Test Accuracy:** `97.0%`
-        * **Recall (Sensitivity):** `98.84%`
-        * **Precision:** `0.9659`
-        * **F1-Score:** `0.9770`
-
-        #### 💻 Tech Stack
-        * **Framework:** TensorFlow 2.19.0 / Python 3.12
-        * **Frontend:** Streamlit Custom UI
+        * **Framework:** TensorFlow runtime engine / Python 3.12
         """
     )
     
