@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing import image
+from tensorflow.keras.utils import img_to_array
 import numpy as np
 from PIL import Image
 import streamlit.components.v1 as components
@@ -361,7 +361,7 @@ model = get_trained_model()
 
 def classify_image(image):
     img_resized = image.resize((224, 224))
-    img_array = image.img_to_array(img_resized)
+    img_array = img_to_array(img_resized)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = img_array / 255.0
     
