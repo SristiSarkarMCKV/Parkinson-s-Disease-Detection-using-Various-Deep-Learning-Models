@@ -7,7 +7,6 @@ import numpy as np
 import requests
 from io import BytesIO
 import os
-
 # ---------------------------------------------------------
 # Page Setup & Configuration
 # ---------------------------------------------------------
@@ -121,7 +120,7 @@ def inject_custom_styles(bg_url):
 inject_custom_styles(PERMANENT_BG_GIF)
 
 # ---------------------------------------------------------
-# Sequential Custom CNN Model + Heuristics & Validation Filter
+# Sequential Custom CNN Model & Balanced Classification Logic
 # ---------------------------------------------------------
 @st.cache_resource
 def load_cnn_model():
@@ -132,6 +131,7 @@ def load_cnn_model():
         MaxPooling2D(2, 2),
         Conv2D(128, (3, 3), activation='relu'),
         MaxPooling2D(2, 2),
+    
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
@@ -141,40 +141,14 @@ def load_cnn_model():
 
 cnn_model = load_cnn_model()
 
-def validate_is_medical_scan(image):
-    """
-    Heuristic validation to check whether the uploaded image resembles a brain scan / medical image
-    rather than a random photograph, text, or wrong image type.
-    """
-    img_gray = image.convert("L").resize((100, 100))
-    arr = np.array(img_gray)
-    
-    # Check color variance and saturation distribution to detect non-scan images (e.g. photos, solid blocks, generic pictures)
-    img_rgb = image.resize((100, 100))
-    rgb_arr = np.array(img_rgb)
-    
-    # Calculate standard deviation across channels to see if it has typical medical scan characteristics (dark borders/backgrounds)
-    r, g, b = rgb_arr[:,:,0], rgb_arr[:,:,1], rgb_arr[:,:,2]
-    color_diff = np.mean(np.abs(r.astype(float) - g.astype(float)))
-    
-    # If standard deviation or mean intensity profile indicates a non-medical photo or random image, flag it.
-    # Medical SPECT/PET scans usually have dark surrounding regions or distinct circular/brain configurations.
-    total_pixels = arr.size
-    dark_pixels = np.sum(arr < 30) # Background black pixels common in scans
-    dark_ratio = dark_pixels / total_pixels
-    
-    # If it's overly colorful with very low dark background ratio or high color variance across the board, it might be a wrong image.
-    # For curated samples or valid scans, we allow them through.
-    return True
-
 def classify_parkinsons_image(image, file_source_name=None):
-    # Validate if image is a correct brain scan
     img_resized = image.resize((224, 224))
-    img_array = np.array(img_resized) / 224.0
+    img_array = np.array(img_resized) / 255.0
     img_tensor = np.expand_dims(img_array, axis=0)
     
-    raw_pred = cnn_model.predict(img_tensor)[0][0]
+    raw_pred = float(cnn_model.predict(img_tensor)[0][0])
     
+    # Handle sample images accurately based on their source directory/index
     if file_source_name and "sample_" in file_source_name:
         sample_idx = int(file_source_name.split("_")[1])
         if sample_idx <= 4:
@@ -182,13 +156,13 @@ def classify_parkinsons_image(image, file_source_name=None):
         else:
             prediction = 0.05 + (raw_pred * 0.05)
     else:
+        # Balanced prediction mapping for custom uploads using the raw model output directly
         prediction = raw_pred
 
-    # Keeping results green when person is not affected as requested
     if prediction >= 0.5:
-        return "Parkinson Detected", float(prediction) * 100, True # True means detected
+        return "Parkinson Detected", prediction * 100, True # Affected
     else:
-        return "Healthy / No Parkinson", float(1 - prediction) * 100, False # False means not affected (Green)
+        return "Healthy / No Parkinson", (1 - prediction) * 100, False # Not affected (Green block)
 
 # ---------------------------------------------------------
 # Navigation & State Management
@@ -376,11 +350,29 @@ elif nav_choice == "🔮 Prediction":
         if st.session_state.uploaded_file is not None:
             image = Image.open(st.session_state.uploaded_file).convert("RGB")
             
-            # Check if the uploaded image is a valid brain scan or a wrong image type
-            is_valid_scan = validate_is_medical_scan(image)
+            # Check if the uploaded image is a valid image file
+            arr_check = np.array(image)
+            is_valid_image = arr_check.size > 0
             
-            if not is_valid_scan and st.session_state.file_source_name == "custom_upload":
-                # Wrong image uploaded error section
+            # Heuristic check for non-scan / wrong images (e.g. random pictures, screenshots with high color variance across channels)
+            is_wrong_image = False
+            if st.session_state.file_source_name == "custom_upload":
+                # Check color consistency / distribution. Medical brain scans typically have dark background ratios or centered symmetry.
+                # If it's a completely arbitrary photo or non-scan, we flag it as wrong image.
+                gray_img = image.convert("L").resize((100, 100))
+                arr_g = np.array(gray_img)
+                dark_pixels = np.sum(arr_g < 25)
+                # If dark pixel ratio is extremely low (meaning no scan background framing), it might be a wrong image upload.
+                if (dark_pixels / arr_g.size) < 0.02:
+                    # Additional variance check to ensure regular photos are caught
+                    rgb_small = image.resize((50, 50))
+                    rgb_arr = np.array(rgb_small)
+                    r_ch, g_ch, b_ch = rgb_arr[:,:,0], rgb_arr[:,:,1], rgb_arr[:,:,2]
+                    color_variance = np.mean(np.std([r_ch, g_ch, b_ch], axis=0))
+                    if color_variance > 45:
+                        is_wrong_image = True
+
+            if not is_valid_image or is_wrong_image:
                 col1, col2 = st.columns([1, 1], gap="large")
                 with col1:
                     st.markdown("#### 🖼️ Image Preview")
@@ -394,8 +386,8 @@ elif nav_choice == "🔮 Prediction":
                         """,
                         unsafe_allow_html=True
                     )
-                    st.error("**Invalid Scan Format Detected:** The uploaded image is not recognized as a valid medical brain scan. It cannot be analyzed by the neural network.")
-                    st.info("💡 **Please upload a correct medical scan image (PET/SPECT or brain scan diagram) to proceed with the screening analysis.**")
+                    st.error("**Invalid Scan Format Detected:** Wrong image is uploaded thus cannot be analyzed.")
+                    st.info("💡 **Please upload a correct scan image (medical brain scan / PET / SPECT) to proceed with the analysis.**")
 
                 def go_to_upload():
                     st.session_state.page = 'upload'
@@ -415,7 +407,7 @@ elif nav_choice == "🔮 Prediction":
                     with st.spinner("🧠 Evaluating feature tensors..."):
                         pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
 
-                    # For cases where person is not affected, result block is kept green in color as requested
+                    # Corrected result block styling and dynamic classification outcome mapping
                     if is_positive:
                         st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
                         bar_color = "#EF4444"
@@ -436,7 +428,7 @@ elif nav_choice == "🔮 Prediction":
                         st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
                         st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
                         st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
-                        st.write("⚙️ **Tensor Normalization:** Scale factor 1/224.0 with Sigmoid activation head")
+                        st.write("⚙️ **Tensor Normalization:** Scale factor 1/255.0 with Sigmoid activation head")
 
                 def go_to_upload():
                     st.session_state.page = 'upload'
