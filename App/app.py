@@ -206,10 +206,10 @@ def get_raw_github_url(github_url):
     return github_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
 
 # =========================================================
-# PAGE 1: HOME PAGE (Focus: Interactive overview, workflow, capabilities)
+# PAGE 1: HOME PAGE
 # =========================================================
 if nav_choice == "🏠 Home":
-    st.markdown("### 🧬 Automated Deep Learning Parkinson Detection Engine")
+    st.markdown("### Automated Deep Learning Parkinson Detection Engine")
     st.markdown(
         "<p style='font-size: 0.95rem; line-height: 1.5;'>"
         "Welcome! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze and classify "
@@ -220,37 +220,29 @@ if nav_choice == "🏠 Home":
     )
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### ⚙️ Classification System Architecture & Workflow")
+    st.markdown("### Classification System Architecture & Workflow")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.5); border-radius: 20px; padding: 20px; color: #F8FAFC; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #A5B4FC; margin-bottom: 14px; text-align: center; letter-spacing: 0.5px;">End-to-End Diagnostic Pipeline</div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; font-size: 0.78rem; font-weight: 600;">
-                <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">📥</div>
-                    <div style="color: #C7D2FE; font-weight: 700; margin-bottom: 2px;">1. Preprocessing</div>
-                    <div>Raw images are resized (224x224), normalized, and converted into tensors.</div>
-                </div>
-                <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">⚙️</div>
-                    <div style="color: #DDD6FE; font-weight: 700; margin-bottom: 2px;">2. CNN Inference</div>
-                    <div>Feature extraction via cascaded Conv2D & Max-Pooling layers.</div>
-                </div>
-                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">🎯</div>
-                    <div style="color: #A7F3D0; font-weight: 700; margin-bottom: 2px;">3. Logic & Classification</div>
-                    <div>Sigmoid classification head outputs clinical confidence scores.</div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.markdown("### Visual Workflow Diagram")
+    st.code(
+        "Raw Brain Scan Image\n"
+        "        │\n"
+        "        ▼\n"
+        "Image Preprocessing & Normalization (Resize to 224x224)\n"
+        "        │\n"
+        "        ▼\n"
+        "Convolutional Neural Network Feature Extraction (Conv2D & MaxPooling)\n"
+        "        │\n"
+        "        ▼\n"
+        "Dense Classification & Sigmoid Activation Head\n"
+        "        │\n"
+        "        ▼\n"
+        "Final Diagnostic Screening Verdict",
+        language="text"
     )
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### 🎯 Core Capabilities Highlight")
+    st.markdown("### Core Capabilities Highlight")
     st.markdown('</div>', unsafe_allow_html=True)
 
     col_a, col_b, col_c = st.columns(3)
@@ -307,14 +299,14 @@ elif nav_choice == "🔮 Prediction":
             st.markdown("### Select a Curated Sample Image:")
             
             sample_images = {
-                "Sample 1 (Affected)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_183520.jpg"),
-                "Sample 2 (Healthy)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_183555.jpg"),
-                "Sample 3 (Affected)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185834.jpg"),
-                "Sample 4 (Healthy)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185816.jpg"),
-                "Sample 5 (Affected)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185944.jpg"),
-                "Sample 6 (Healthy)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185849.jpg"),
-                "Sample 7 (Affected)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185906.jpg"),
-                "Sample 8 (Healthy)": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185926.jpg")
+                "Sample 1": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_183520.jpg"),
+                "Sample 2": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_183555.jpg"),
+                "Sample 3": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185834.jpg"),
+                "Sample 4": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185816.jpg"),
+                "Sample 5": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185944.jpg"),
+                "Sample 6": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185849.jpg"),
+                "Sample 7": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_185906.jpg"),
+                "Sample 8": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Not%20affected/IMG_20260806_185926.jpg")
             }
 
             cols = st.columns(4)
@@ -369,7 +361,7 @@ elif nav_choice == "🔮 Prediction":
                         unsafe_allow_html=True
                     )
                     st.error("**Invalid Scan Format Detected:** The uploaded image is not recognized as a valid medical brain scan. It cannot be analyzed by the neural network.")
-                    st.info("💡 **Please upload a correct medical scan image (PET/SPECT or brain scan diagram) to proceed with the screening analysis.**")
+                    st.info("💡 **Please upload a correct medical scan image to proceed with the screening analysis.**")
 
                 def go_to_upload():
                     st.session_state.page = 'upload'
@@ -389,6 +381,14 @@ elif nav_choice == "🔮 Prediction":
                     with st.spinner("🧠 Evaluating feature tensors..."):
                         pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
 
+                    expected_output_text = "Unknown"
+                    if st.session_state.file_source_name and "sample_" in st.session_state.file_source_name:
+                        sample_num = int(st.session_state.file_source_name.split("_")[1])
+                        if sample_num in [1, 3, 5, 7]:
+                            expected_output_text = "Parkinson Detected (Affected)"
+                        else:
+                            expected_output_text = "Healthy / No Parkinson (Not Affected)"
+
                     if is_positive:
                         st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
                         bar_color = "#EF4444"
@@ -406,6 +406,8 @@ elif nav_choice == "🔮 Prediction":
                     st.markdown(progress_html, unsafe_allow_html=True)
 
                     with st.expander("🔬 View Technical Details"):
+                        if st.session_state.file_source_name and "sample_" in st.session_state.file_source_name:
+                            st.write(f"📌 **Expected Output:** `{expected_output_text}`")
                         st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
                         st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
                         st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
@@ -424,18 +426,18 @@ elif nav_choice == "🔮 Prediction":
             st.button("⬅️ Back to Upload Page", on_click=go_to_upload)
 
 # =========================================================
-# PAGE 3: ABOUT PAGE (Focus: Deep technical documentation, metrics, architecture specs)
+# PAGE 3: ABOUT PAGE
 # =========================================================
 elif nav_choice == "ℹ️ About":
-    st.markdown("### ℹ️ Technical Specifications & Architecture")
+    st.markdown("### Technical Specifications & Architecture")
     st.markdown(
-        "An automated, non-invasive deep learning diagnostic pipeline built to evaluate biomarkers from visual cohorts "
-        "using custom Sequential Convolutional Neural Networks (CNN). Leveraging state-of-the-art intensity range normalizations "
+        "An automated deep learning diagnostic pipeline built to evaluate biomarkers from visual cohorts "
+        "using custom Sequential Convolutional Neural Networks. Leveraging state-of-the-art intensity range normalizations "
         "and real-time data augmentations, this framework achieves a definitive clinical test accuracy of **97.0%**."
     )
     
     st.markdown("---")
-    st.markdown("### 📌 Core Engineering Highlights")
+    st.markdown("### Core Engineering Highlights")
     st.markdown(
         "* **State-of-the-Art Accuracy:** Achieved **97.0% Validation & Test Accuracy** within 10 training epochs.\n"
         "* **Clinical Safety First:** Optimizes for a **98.84% Recall rate** on positive cases to minimize dangerous False Negatives.\n"
@@ -443,11 +445,11 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown("---")
-    st.markdown("### 🏗️ End-to-End Pipeline Steps")
-    st.markdown("The repository maps directly to a rigorous 11-step execution architecture:")
+    st.markdown("### End-to-End Pipeline Steps")
+    st.markdown("The repository maps directly to a rigorous execution architecture:")
     
     st.markdown(
-        "#### 1. Environment & Path Configurations\n"
+        "#### Environment & Path Configurations\n"
         "Automatically unzips and validates the structural integrity of the workspace. Dynamically maps nested internal layouts into robust environmental paths:"
     )
     st.code(
@@ -458,7 +460,7 @@ elif nav_choice == "ℹ️ About":
     )
     
     st.markdown(
-        "#### 2. Dataset Preparation & Augmentation Engine\n"
+        "#### Dataset Preparation & Augmentation Engine\n"
         "Uses real-time data generators to scale intensities, apply structural transformations to protect against overfitting, and split training data with a 20% validation anchor:\n"
         "* **Train Set:** 413 images\n"
         "* **Validation Set:** 103 images\n"
@@ -467,7 +469,7 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown(
-        "#### 3. Deep Learning Core Model Design\n"
+        "#### Deep Learning Core Model Design\n"
         "A sequential feature extraction model structured with three cascaded 2D Convolution and Max-Pooling layers, leading to a high-density decision head:"
     )
     st.code(
@@ -482,12 +484,12 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown(
-        "#### 4. Neural Network Training\n"
-        "Compiled using the **Adam Optimizer** and evaluated through **Binary Cross-Entropy Loss**. Trained over 10 stable epochs with a mini-batch constraints size of 32."
+        "#### Neural Network Training\n"
+        "Compiled using the **Adam Optimizer** and evaluated through **Binary Cross-Entropy Loss**. Trained over 10 stable epochs with mini-batch constraints size of 32."
     )
 
     st.markdown("---")
-    st.markdown("### 📊 Model Summary & Parameter Footprint")
+    st.markdown("### Model Summary & Parameter Footprint")
     st.code(
         "Model: \"sequential\"\n"
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓\n"
@@ -510,9 +512,9 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown("---")
-    st.markdown("### 📈 Experimental Performance Results")
+    st.markdown("### Experimental Performance Results")
     st.markdown("#### Classification Report Matrix")
-    st.markdown("Evaluated over 129 completely unseen target samples containing distinct categorical classes (`YES` vs. `NO`).")
+    st.markdown("Evaluated over 129 completely unseen target samples containing distinct categorical classes.")
     st.code(
         "              precision    recall  f1-score   support\n\n"
         "          NO       0.98      0.93      0.95        43\n"
@@ -532,8 +534,8 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown("---")
-    st.markdown("### 🚀 Model Deployment & Single-Image Inference")
-    st.markdown("The framework ships with an integrated, standalone prediction pipeline (`Step 11`) to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.")
+    st.markdown("### Model Deployment & Single-Image Inference")
+    st.markdown("The framework ships with an integrated prediction pipeline to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.")
     st.code(
         "Classes found in test directory: ['YES', 'NO']\n"
         "1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 202ms/step\n"
@@ -542,7 +544,7 @@ elif nav_choice == "ℹ️ About":
     )
     
     st.markdown("---")
-    st.markdown("### 👩‍💻 Developer Details")
+    st.markdown("### Developer Details")
     st.markdown(
         "* **Name:** Sristi Sarkar\n"
         "* **Contact:**\n"
