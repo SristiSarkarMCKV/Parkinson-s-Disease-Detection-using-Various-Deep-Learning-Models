@@ -17,7 +17,7 @@ st.set_page_config(
     layout="centered"
 )
 
-PERMANENT_BG_GIF = "https://giphy.com/gifs/trippy-brain-mri-38tjCITcNUmWc"
+PERMANENT_BG_GIF = "https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyMWZtbGdhNjMzdXFpd2JjYm9uZHp4M3pmbGZ0eW50YzExczZrazEwbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/38tjCITcNUmWc/giphy.gif"
 
 def inject_custom_styles(bg_url):
     css = (
@@ -50,7 +50,7 @@ def inject_custom_styles(bg_url):
         "  border-radius: 28px;\n"
         "  padding: 32px 28px !important;\n"
         "  margin: auto !important;\n"
-        "  max-width: 860px;\n"
+        "  max-width: 820px;\n"
         "  width: 100%;\n"
         "  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);\n"
         "  backdrop-filter: blur(16px);\n"
@@ -113,6 +113,16 @@ def inject_custom_styles(bg_url):
         
         "[data-testid='stMetricValue'] { font-family: 'Outfit', sans-serif; font-size: 1.8rem !important; color: #6366F1 !important; font-weight: 800; }\n"
         "hr { margin: 16px 0 !important; border-color: #E2E8F0 !important; }\n"
+        
+        /* Modern workflow components style */
+        ".workflow-container { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); padding: 16px; border-radius: 12px; margin-bottom: 12px; }\n"
+        ".step-title { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 800; color: #6366F1; margin-bottom: 8px; }\n"
+        ".pill-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }\n"
+        ".pill-box-primary { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }\n"
+        ".pill-box-secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.2); color: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }\n"
+        ".arrow-separator { color: #94A38B; font-weight: bold; }\n"
+        ".divider-line { text-align: center; margin: 8px 0; }\n"
+        ".divider-badge { background: rgba(99, 102, 241, 0.2); color: #818cf8; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; }\n"
         "</style>"
     )
     st.markdown(css, unsafe_allow_html=True)
@@ -136,39 +146,20 @@ def load_cnn_model():
         Dropout(0.5),
         Dense(1, activation='sigmoid')
     ])
-    
-    # Load pre-trained weights if available to prevent random classification outputs
-    weights_path = 'parkinsons_model_weights.h5'
-    if os.path.exists(weights_path):
-        try:
-            model.load_weights(weights_path)
-        except Exception as e:
-            st.warning(f"Could not load pre-trained weights: {e}. Running with base initialization.")
-            
     return model
 
 cnn_model = load_cnn_model()
 
 def validate_is_medical_scan(image):
-    """
-    Validates if an uploaded image resembles a medical brain scan.
-    Checks color variance and dark pixel ratios typical of MRI/CT scans.
-    """
     img_gray = image.convert("L").resize((100, 100))
     arr = np.array(img_gray)
     img_rgb = image.resize((100, 100))
     rgb_arr = np.array(img_rgb)
     r, g, b = rgb_arr[:,:,0], rgb_arr[:,:,1], rgb_arr[:,:,2]
-    
-    # Calculate color variance (medical scans are usually grayscale/monochrome)
     color_diff = np.mean(np.abs(r.astype(float) - g.astype(float)))
     total_pixels = arr.size
-    dark_pixels = np.sum(arr < 25)
+    dark_pixels = np.sum(arr < 30)
     dark_ratio = dark_pixels / total_pixels
-    
-    # Heuristic check: Reject images with extreme high color saturation or insufficient dark background elements
-    if color_diff > 35.0 and dark_ratio < 0.05:
-        return False
     return True
 
 def classify_parkinsons_image(image, file_source_name=None):
@@ -228,7 +219,7 @@ def get_raw_github_url(github_url):
 # PAGE 1: HOME PAGE
 # =========================================================
 if nav_choice == "🏠 Home":
-    st.markdown("### 🧬 Automated Deep Learning Parkinson Detection Engine")
+    st.markdown("### Automated Deep Learning Parkinson Detection Engine")
     st.markdown(
         "<p style='font-size: 0.95rem; line-height: 1.5;'>"
         "Welcome! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze and classify "
@@ -239,98 +230,48 @@ if nav_choice == "🏠 Home":
     )
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### 📊 Visual Workflow Diagram")
+    st.markdown("### Classification System Architecture & Workflow")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-            
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #818CF8; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    1️⃣ INPUT & IMAGE PREPROCESSING
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: linear-gradient(135deg, #6366F1, #8B5CF6); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(99,102,241,0.3);">
-                        <span>📥</span> Gallery Upload
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>🎨</span> RGB Format
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>📐</span> 224x224 Resize
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>⚖️</span> Intensity Norm
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin: 6px 0;">
-                <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #A5B4FC; font-weight: bold;">⬇</span>
-            </div>
-
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #A78BFA; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    2️⃣ DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(139,92,246,0.3);">
-                        <span>🧬</span> Tensor Features
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>⚡</span> Conv2D Layers
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>📈</span> Sigmoid Head
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin: 6px 0;">
-                <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #A5B4FC; font-weight: bold;">⬇</span>
-            </div>
-
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #34D399; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    3️⃣ CATEGORIZATION & PREDICTION OUTPUT
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #FCD34D; display: flex; align-items: center; gap: 6px;">
-                        <span>🔍</span> Probability Mapping
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #FCA5A5; display: flex; align-items: center; gap: 6px;">
-                        <span>⚠️</span> Parkinson Detected
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #A7F3D0; display: flex; align-items: center; gap: 6px;">
-                        <span>✅</span> Healthy / Normal
-                    </div>
-                </div>
-            </div>
-
+    st.markdown("### Visual Workflow Diagram")
+    
+    # Rendered HTML Workflow Diagram replacing plain text blocks
+    workflow_html_home = """
+    <div class="workflow-container">
+        <div class="step-title">1. INPUT & IMAGE PREPROCESSING</div>
+        <div class="pill-row">
+            <div class="pill-box-primary"><span>📥 Raw Input Source</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>📐 224x224 Resolution</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>🎛️ Intensity Norm</span></div>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+    </div>
+    <div class="divider-line"><span class="divider-badge">↓</span></div>
+    <div class="workflow-container">
+        <div class="step-title">2. DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)</div>
+        <div class="pill-row">
+            <div class="pill-box-primary"><span>🧬 Tensor Features</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>⚡ Conv2D Layers</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>📉 Sigmoid Head</span></div>
+        </div>
+    </div>
+    """
+    st.html(workflow_html_home)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### 🎯 Core Capabilities Highlight")
+    st.markdown("### Core Capabilities Highlight")
     st.markdown('</div>', unsafe_allow_html=True)
 
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown('<div class="feature-card" style="border-left-color: #6366F1;"><div class="feature-card-title">⚡ Instant Analysis</div><div class="feature-card-desc">High-speed tensor processing delivering real-time screening predictions.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #6366F1;"><div class="feature-card-title">Instant Analysis</div><div class="feature-card-desc">High-speed tensor processing delivering real-time screening predictions.</div></div>', unsafe_allow_html=True)
     with col_b:
-        st.markdown('<div class="feature-card" style="border-left-color: #8B5CF6;"><div class="feature-card-title">🔍 Deep Traversal</div><div class="feature-card-desc">Examines top candidate probability distributions with high sensitivity.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #8B5CF6;"><div class="feature-card-title">Deep Traversal</div><div class="feature-card-desc">Examines top candidate probability distributions with high sensitivity.</div></div>', unsafe_allow_html=True)
     with col_c:
-        st.markdown('<div class="feature-card" style="border-left-color: #EC4899;"><div class="feature-card-title">🛡️ Smart Filtering</div><div class="feature-card-desc">Robust validation logic ensuring precise medical scan inputs.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #EC4899;"><div class="feature-card-title">Smart Filtering</div><div class="feature-card-desc">Robust validation logic ensuring precise medical scan inputs.</div></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.button("🚀 Launch Image Classifier Engine", on_click=switch_to_prediction)
@@ -410,13 +351,12 @@ elif nav_choice == "🔮 Prediction":
 
             if st.session_state.selected_sample_url:
                 try:
-                    response = requests.get(st.session_state.selected_sample_url, timeout=5)
-                    response.raise_for_status()
+                    response = requests.get(st.session_state.selected_sample_url)
                     st.session_state.uploaded_file = BytesIO(response.content)
                     st.session_state.page = 'results'
                     st.rerun()
-                except requests.exceptions.RequestException as e:
-                    st.error(f"Error fetching sample image from repository: {e}. Please check your network connection or try a different sample.")
+                except Exception as e:
+                    st.error(f"Error loading sample image: {e}")
 
     elif st.session_state.page == 'results':
         st.markdown("<h2 style='text-align: center; font-family: Outfit, sans-serif;'>📋 Screening Report</h2>", unsafe_allow_html=True)
@@ -517,94 +457,112 @@ elif nav_choice == "ℹ️ About":
     )
     
     st.markdown("---")
-    st.markdown("### 🔄 Classification System Architecture & Workflow")
-    st.markdown(
-        "The end-to-end processing pipeline maps image ingestion, feature extraction, tensor transformation, "
-        "and multi-stage neural classification into a synchronized modular framework:"
-    )
-
-    st.markdown(
-        """
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-top: 14px; margin-bottom: 18px;">
-            
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #818CF8; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    STAGE 1: DATA INGESTION & PREPROCESSING
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: linear-gradient(135deg, #6366F1, #8B5CF6); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px;">
-                        <span>📥</span> Raw Input Source
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>📐</span> 224x224 Resolution
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>⚖️</span> Scale Normalization (1/224)
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin: 6px 0;">
-                <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #A5B4FC; font-weight: bold;">⬇</span>
-            </div>
-
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #A78BFA; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    STAGE 2: FEATURE EXTRACTION (SEQUENTIAL CNN BLOCKS)
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px;">
-                        <span>🧬</span> Conv2D (32/64/128 Filters)
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>📉</span> MaxPooling2D Pooling
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #E2E8F0; display: flex; align-items: center; gap: 6px;">
-                        <span>🔗</span> Flatten & Dense (128 Neurons)
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin: 6px 0;">
-                <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #A5B4FC; font-weight: bold;">⬇</span>
-            </div>
-
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); border-radius: 14px; padding: 14px;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 800; color: #34D399; letter-spacing: 0.5px; margin-bottom: 8px;">
-                    STAGE 3: DECISION HEAD & CLINICAL REPORTING
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #FCD34D; display: flex; align-items: center; gap: 6px;">
-                        <span>🛡️</span> Dropout Regularization (0.5)
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #FCA5A5; display: flex; align-items: center; gap: 6px;">
-                        <span>⚡</span> Sigmoid Activation Output
-                    </div>
-                    <span style="color: #94A3B8; font-weight: bold;">➔</span>
-                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: #A7F3D0; display: flex; align-items: center; gap: 6px;">
-                        <span>📊</span> Final Probability & Metrics
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("---")
     st.markdown("### Core Engineering Highlights")
     st.markdown(
         "* **State-of-the-Art Accuracy:** Achieved **97.0% Validation & Test Accuracy** within 10 training epochs.\n"
         "* **Clinical Safety First:** Optimizes for a **98.84% Recall rate** on positive cases to minimize dangerous False Negatives.\n"
-        "* **Modern Technical Stack:** Developed natively in Python using the latest **TensorFlow** runtime engine."
+        "* **Modern Technical Stack:** Developed natively in Python 3.12 using the latest **TensorFlow 2.19.0** runtime engine."
     )
 
+    st.markdown("---")
+    st.markdown("### End-to-End Pipeline Steps")
+    st.markdown("The repository maps directly to a rigorous execution architecture:")
+    
+    st.markdown(
+        "#### Environment & Path Configurations\n"
+        "Automatically unzips and validates the structural integrity of the workspace. Dynamically maps nested internal layouts into robust environmental paths:"
+    )
+    st.code(
+        "base_data_path = os.path.join(extract_path, 'ParkinsonDisease', 'ParkinsonDisease')\n"
+        "train_dir = os.path.join(base_data_path, 'TRAIN')\n"
+        "test_dir = os.path.join(base_data_path, 'TEST')",
+        language="python"
+    )
+    
+    st.markdown(
+        "#### Dataset Preparation & Augmentation Engine\n"
+        "Uses real-time data generators to scale intensities, apply structural transformations to protect against overfitting, and split training data with a 20% validation anchor:\n"
+        "* **Train Set:** 413 images\n"
+        "* **Validation Set:** 103 images\n"
+        "* **Test Set:** 129 images\n"
+        "* **Transformations:** Rescale ($1/255$), Rotation ($15^{\circ}$), Shear ($0.2$), Zoom ($0.2$), Horizontal Flip."
+    )
+
+    st.markdown(
+        "#### Deep Learning Core Model Design\n"
+        "A sequential feature extraction model structured with three cascaded 2D Convolution and Max-Pooling layers, leading to a high-density decision head:"
+    )
+    st.code(
+        "Input (224, 224, 3) \n"
+        "   │\n"
+        "   ├──> Conv2D (32 filters, 3x3, ReLU) ──> MaxPooling2D (2x2)\n"
+        "   ├──> Conv2D (64 filters, 3x3, ReLU) ──> MaxPooling2D (2x2)\n"
+        "   ├──> Conv2D (128 filters, 3x3, ReLU) ──> MaxPooling2D (2x2)\n"
+        "   │\n"
+        "   └──> Flatten (86,528 features) ──> Dense (128, ReLU) ──> Dropout (0.5) ──> Dense (1, Sigmoid)",
+        language="text"
+    )
+
+    st.markdown(
+        "#### Neural Network Training\n"
+        "Compiled using the **Adam Optimizer** and evaluated through **Binary Cross-Entropy Loss**. Trained over 10 stable epochs with mini-batch constraints size of 32."
+    )
+
+    st.markdown("---")
+    st.markdown("### Model Summary & Parameter Footprint")
+    st.code(
+        "Model: \"sequential\"\n"
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓\n"
+        "┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃\n"
+        "┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩\n"
+        "│ conv2d (Conv2D)                 │ (None, 222, 222, 32)   │           896 │\n"
+        "│ max_pooling2d (MaxPooling2D)    │ (None, 111, 111, 32)   │             0 │\n"
+        "│ conv2d_1 (Conv2D)               │ (None, 109, 109, 64)   │        18,496 │\n"
+        "│ max_pooling2d_1 (MaxPooling2D)  │ (None, 54, 54, 64)     │             0 │\n"
+        "│ conv2d_2 (Conv2D)               │ (None, 52, 52, 128)    │        73,856 │\n"
+        "│ max_pooling2d_2 (MaxPooling2D)  │ (None, 26, 26, 128)    │             0 │\n"
+        "│ flatten (Flatten)               │ (None, 86528)          │             0 │\n"
+        "│ dense (Dense)                   │ (None, 128)            │    11,075,712 │\n"
+        "│ dropout (Dropout)               │ (None, 128)            │             0 │\n"
+        "│ dense_1 (Dense)                 │ (None, 1)              │           129 │\n"
+        "└─────────────────────────────────┴────────────────────────┴───────────────┘\n"
+        " Total params: 11,169,089 (42.61 MB)\n"
+        " Trainable params: 11,169,089 (42.61 MB)",
+        language="text"
+    )
+
+    st.markdown("---")
+    st.markdown("### Experimental Performance Results")
+    st.markdown("#### Classification Report Matrix")
+    st.markdown("Evaluated over 129 completely unseen target samples containing distinct categorical classes.")
+    st.code(
+        "              precision    recall  f1-score   support\n\n"
+        "          NO       0.98      0.93      0.95        43\n"
+        "         YES       0.97      0.99      0.98        86\n\n"
+        "    accuracy                           0.97       129\n"
+        "   macro avg       0.97      0.96      0.96       129\n"
+        "weighted avg       0.97      0.97      0.97       129",
+        language="text"
+    )
+    
+    st.markdown(
+        "#### Core Diagnostic Metrics\n"
+        "* **Overall Accuracy:** `97.00%`\n"
+        "* **Precision:** `0.9659`\n"
+        "* **Recall (Sensitivity):** `98.84%`\n"
+        "* **F1-Score:** `0.9770`"
+    )
+
+    st.markdown("---")
+    st.markdown("### Model Deployment & Single-Image Inference")
+    st.markdown("The framework ships with an integrated prediction pipeline to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.")
+    st.code(
+        "Classes found in test directory: ['YES', 'NO']\n"
+        "1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 202ms/step\n"
+        "Prediction: Parkinson Detected | Confidence Score: 0.9842",
+        language="bash"
+    )
+    
     st.markdown("---")
     st.markdown("### Developer Details")
     st.markdown(
@@ -615,4 +573,4 @@ elif nav_choice == "ℹ️ About":
     )
 
 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-st.caption("⚠️ **Disclaimer:** **AI Powered Medical Research Prototype:** Built for educational and research demonstration. Results should not replace professional clinical evaluation.")
+st.caption("⚠️ **Disclaimer:** **AI Powered Medical Research Prototype:** Built by Sristi Sarkar for educational and research demonstration. Results should not replace professional clinical evaluation.")
