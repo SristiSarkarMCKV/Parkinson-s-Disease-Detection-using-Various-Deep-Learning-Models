@@ -196,7 +196,7 @@ inject_custom_styles(PERMANENT_BG_GIF)
 
 
 # ---------------------------------------------------------
-# Enhanced Model Training Engine (Optimized Epochs & Callbacks)
+# Enhanced Model Training Engine (Optimized for Streamlit Cloud execution timeouts)
 # ---------------------------------------------------------
 @st.cache_resource
 def get_trained_model():
@@ -206,7 +206,7 @@ def get_trained_model():
         st.toast("Loading verified clinical model weights...", icon="🩺")
         return tf.keras.models.load_model(model_path)
 
-    st.warning("Initializing high-precision training pipeline. Downloading dataset and fitting deep neural network...")
+    st.warning("Initializing lightweight training pipeline to comply with resource limits...")
 
     os.makedirs("dataset", exist_ok=True)
     gdrive_url = "https://drive.google.com/uc?id=152qN11WKtE-2LstEXOMOLaoTw0o3HTaL"
@@ -232,14 +232,12 @@ def get_trained_model():
         st.error(f"Directory path error: {train_dir}")
         return None
 
-    # Advanced Data Augmentation to enhance generalization and accuracy
+    # Optimized batch size and validation split to prevent memory/timeout limits on free tiers
     train_datagen = ImageDataGenerator(
         rescale=1.0/255,
-        rotation_range=20,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        shear_range=0.1,
-        zoom_range=0.2,
+        rotation_range=10,
+        width_shift_range=0.05,
+        height_shift_range=0.05,
         horizontal_flip=True,
         validation_split=0.2
     )
@@ -247,7 +245,7 @@ def get_trained_model():
     train_generator = train_datagen.flow_from_directory(
         train_dir,
         target_size=(224, 224),
-        batch_size=32,
+        batch_size=64,
         class_mode='binary',
         subset='training'
     )
@@ -255,12 +253,12 @@ def get_trained_model():
     val_generator = train_datagen.flow_from_directory(
         train_dir,
         target_size=(224, 224),
-        batch_size=32,
+        batch_size=64,
         class_mode='binary',
         subset='validation'
     )
 
-    # Deeper, regularized CNN structure with Batch Normalization
+    # Streamlined CNN structure for rapid cloud execution
     model = Sequential([
         Input(shape=(224, 224, 3)),
         Conv2D(32, (3, 3), padding='same', activation='relu'),
@@ -274,31 +272,27 @@ def get_trained_model():
         Conv2D(128, (3, 3), padding='same', activation='relu'),
         BatchNormalization(),
         MaxPooling2D(2, 2),
-
-        Conv2D(256, (3, 3), padding='same', activation='relu'),
-        BatchNormalization(),
-        MaxPooling2D(2, 2),
         
         Flatten(),
-        Dense(256, activation='relu'),
-        Dropout(0.5),
+        Dense(128, activation='relu'),
+        Dropout(0.4),
         Dense(1, activation='sigmoid')
     ])
 
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0005), 
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), 
         loss='binary_crossentropy', 
-        metrics=['accuracy', tf.keras.metrics.AUC(name='auc')]
+        metrics=['accuracy']
     )
 
-    # Callbacks to optimize convergence and prevent overfitting across extended epochs
-    lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=2, factor=0.5, min_lr=1e-6, verbose=1)
-    early_stopping = EarlyStopping(monitor='val_accuracy', patience=4, restore_best_weights=True, verbose=1)
+    # Accelerated single-epoch fitting or minimal epochs to prevent worker timeouts
+    lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=1, factor=0.5, min_lr=1e-5, verbose=1)
+    early_stopping = EarlyStopping(monitor='accuracy', patience=2, restore_best_weights=True, verbose=1)
 
-    with st.spinner("Executing model training across optimized epochs (Targeting >97% accuracy)..."):
+    with st.spinner("Executing rapid training across epochs..."):
         model.fit(
             train_generator,
-            epochs=15,
+            epochs=3,
             validation_data=val_generator,
             callbacks=[lr_reduction, early_stopping]
         )
