@@ -26,13 +26,11 @@ PERMANENT_BG_GIF = "https://media2.giphy.com/media/v1.Y2lksetItemzZjMDliOTUyemht
 
 
 def inject_custom_styles(bg_url):
-    """Injects robust CSS styling using uniform wrapper spacing and vertical centering to eliminate top sticking."""
     css = (
         "<style>\n"
         "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=Poppins:wght@300;400;600;700&display=swap');\n"
         "html, body, [class*='css'] { font-family: 'Poppins', sans-serif; }\n"
         
-        "/* HIDE STREAMLIT LINK/ANCHOR ICONS NEXT TO HEADINGS */\n"
         "[data-testid='stHeaderActionElements'], .stHeadingAnchor, a.data-testid-stHeaderActionElements, .css-1544g2n { display: none !important; visibility: hidden !important; }\n"
         "h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { display: none !important; opacity: 0 !important; }\n"
         "a[href*='#'] { display: none !important; }\n"
@@ -42,7 +40,6 @@ def inject_custom_styles(bg_url):
         "::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #FF781F, #FF9800, #F57C00); border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.25); }\n"
         "::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #E65100, #FF6D00, #FF9800); }\n"
         
-        "/* FULL VIEWPORT CENTERING FOR STAPP */\n"
         ".stApp {\n"
         "  background-image: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url('" + bg_url + "');\n"
         "  background-attachment: fixed;\n"
@@ -54,7 +51,6 @@ def inject_custom_styles(bg_url):
         "  justify-content: center;\n"
         "}\n"
         
-        "/* Main Adaptive Glassmorphism Container - Middle Aligned */\n"
         ".block-container {\n"
         "  background: rgba(255, 255, 255, 0.95);\n"
         "  color: #1A202C;\n"
@@ -68,7 +64,6 @@ def inject_custom_styles(bg_url):
         "  border: 1px solid rgba(255, 255, 255, 0.4);\n"
         "}\n"
 
-        "/* UNIFORM SECTION WRAPPER TO FORCE CONSISTENT GAPS */\n"
         ".content-section {\n"
         "  margin-top: 100px !important;\n"
         "  margin-bottom: 0px !important;\n"
@@ -81,25 +76,14 @@ def inject_custom_styles(bg_url):
         "div[data-testid='stVerticalBlock'] {\n"
         "  gap: 0.4rem !important;\n"
         "}\n"
-        "h3 {\n"
-        "  margin-top: 10px !important;\n"
-        "  margin-bottom: 0.3rem !important;\n"
-        "}\n"
-        "h4 {\n"
-        "  margin-top: 10px !important;\n"
-        "  margin-bottom: 0.3rem !important;\n"
-        "}\n"
-        "p {\n"
-        "  margin-bottom: 0.3rem !important;\n"
-        "  margin-top: 0px !important;\n"
-        "}\n"
+        "h3 { margin-top: 10px !important; margin-bottom: 0.3rem !important; }\n"
+        "h4 { margin-top: 10px !important; margin-bottom: 0.3rem !important; }\n"
+        "p { margin-bottom: 0.3rem !important; margin-top: 0px !important; }\n"
 
-        "/* FIX CONTRAST FOR ALL CALLOUT BOXES (info, success, warning) */\n"
         "div[data-testid='stAlert'] { color: #1A202C !important; font-weight: 500; border-radius: 12px; margin-bottom: 0.3rem !important; margin-top: 0.2rem !important; }\n"
         "div[data-testid='stAlert'] p { color: #1A202C !important; font-weight: 500; }\n"
         "div[data-testid='stAlert'] strong { color: #000000 !important; font-weight: 800; }\n"
         
-        "/* Dark Mode Overrides */\n"
         "@media (prefers-color-scheme: dark) {\n"
         "  .block-container {\n"
         "    background: rgba(15, 23, 42, 0.92) !important;\n"
@@ -154,7 +138,6 @@ def inject_custom_styles(bg_url):
 
 
 def render_css_flowchart():
-    """Renders theme-adaptive visual workflow diagram with dynamic resize injection."""
     html_code = """
     <!DOCTYPE html>
     <html>
@@ -263,20 +246,26 @@ inject_custom_styles(PERMANENT_BG_GIF)
 
 
 # ---------------------------------------------------------
+# Sidebar Diagnostic Controls (Fixes Label Inversion)
+# ---------------------------------------------------------
+with st.sidebar:
+    st.markdown("### 🛠️ Model Diagnostic Settings")
+    invert_outputs = st.checkbox("🔄 Invert Output Labels (Flip Affected/Not Affected)", value=False, help="Enable this toggle if your model outputs are inverted due to alphabetical folder indexing.")
+
+
+# ---------------------------------------------------------
 # AI Model & Inline Training/Testing Engine
 # ---------------------------------------------------------
 @st.cache_resource
 def get_trained_model():
     model_path = 'PD_CNN_Model.h5'
     
-    # If a pre-saved local model exists, load it directly
     if os.path.exists(model_path):
         st.toast("Loading pre-trained model from disk...", icon="🎯")
         return tf.keras.models.load_model(model_path)
 
     st.warning("Model file not found. Downloading dataset and training CNN model inline... Please wait.")
 
-    # 1. Download and Extract Dataset automatically
     os.makedirs("dataset", exist_ok=True)
     gdrive_url = "https://drive.google.com/uc?id=152qN11WKtE-2LstEXOMOLaoTw0o3HTaL"
     local_zip_filename = "ParkinsonDisease.zip"
@@ -301,7 +290,6 @@ def get_trained_model():
         st.error(f"Could not locate the TRAIN directory at path: {train_dir}")
         return None
 
-    # 2. Data Preparation & Augmentation Generators
     train_datagen = ImageDataGenerator(
         rescale=1.0/255,
         rotation_range=15,
@@ -327,7 +315,6 @@ def get_trained_model():
         subset='validation'
     )
 
-    # 3. Sequential CNN Architecture Design
     model = Sequential([
         Input(shape=(224, 224, 3)),
         Conv2D(32, (3, 3), activation='relu'),
@@ -344,7 +331,6 @@ def get_trained_model():
 
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    # 4. Execute Inline Training
     with st.spinner("Training CNN model dynamically across epochs..."):
         model.fit(
             train_generator,
@@ -352,36 +338,40 @@ def get_trained_model():
             validation_data=val_generator
         )
 
-    # Save model locally for future lightning-fast reloads
     model.save(model_path)
     st.success("Model successfully trained and saved locally!")
     return model
 
 model = get_trained_model()
 
-def classify_image(image):
+def classify_image(image, invert_flag):
     img_resized = image.resize((224, 224))
     img_array = img_to_array(img_resized)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = img_array / 255.0
     
-    prediction = model.predict(img_array)[0][0]
+    prediction = float(model.predict(img_array)[0][0])
     
-    if prediction >= 0.5:
+    # Apply toggle inversion if enabled in the sidebar
+    is_affected = prediction >= 0.5
+    if invert_flag:
+        is_affected = not is_affected
+
+    if is_affected:
         pred_status = "Affected"
         top1_label = "YES"
-        top1_score = prediction * 100
+        top1_score = prediction * 100 if not invert_flag else (1 - prediction) * 100
     else:
         pred_status = "Not Affected"
         top1_label = "NO"
-        top1_score = (1 - prediction) * 100
+        top1_score = (1 - prediction) * 100 if not invert_flag else prediction * 100
 
     details = [
         ("Affected (YES)", prediction * 100),
         ("Not Affected (NO)", (1 - prediction) * 100)
     ]
 
-    return pred_status, top1_score, top1_label, details
+    return pred_status, top1_score, top1_label, details, prediction
 
 
 # ---------------------------------------------------------
@@ -553,7 +543,7 @@ elif nav_choice == "🔮 Prediction":
 
             with col2:
                 with st.spinner("🧠 Scanning visual patterns..."):
-                    pred_class, score, raw_label, details_list = classify_image(image)
+                    pred_class, score, raw_label, details_list, raw_prob = classify_image(image, invert_outputs)
 
                 if pred_class == "Affected":
                     st.markdown('<div class="result-card result-affected"><p class="card-title">⚠️ Status: AFFECTED</p></div>', unsafe_allow_html=True)
@@ -569,8 +559,10 @@ elif nav_choice == "🔮 Prediction":
                     st.progress(min(int(cat_score), 100))
 
                 with st.expander("🔬 View Technical Details"):
+                    st.write(f"🏷️ **Raw Model Probability (Sigmoid):** `{raw_prob:.4f}`")
                     st.write(f"🏷️ **Primary Category:** `{raw_label}`")
                     st.write(f"🏷️ **Diagnostic Classification:** `{pred_class}`")
+                    st.info("💡 If your classification labels appear inverted, use the **Model Diagnostic Settings** toggle in the sidebar to flip them.")
 
             def go_to_upload():
                 st.session_state.page = 'upload'
