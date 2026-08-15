@@ -17,7 +17,7 @@ st.set_page_config(
     layout="centered"
 )
 
-PERMANENT_BG_GIF = "https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyMWZtbGdhNjMzdXFpd2JjYm9uZHp4M3pmbGZ0eW50YzExczZrazEwbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/38tjCITcNUmWc/giphy.gif"
+PERMANENT_BG_GIF = "https://giphy.com/gifs/trippy-brain-mri-38tjCITcNUmWc"
 
 def inject_custom_styles(bg_url):
     css = (
@@ -114,7 +114,6 @@ def inject_custom_styles(bg_url):
         "[data-testid='stMetricValue'] { font-family: 'Outfit', sans-serif; font-size: 1.8rem !important; color: #6366F1 !important; font-weight: 800; }\n"
         "hr { margin: 16px 0 !important; border-color: #E2E8F0 !important; }\n"
         
-        /* Modern workflow components style */
         ".workflow-container { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); padding: 16px; border-radius: 12px; margin-bottom: 12px; }\n"
         ".step-title { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 800; color: #6366F1; margin-bottom: 8px; }\n"
         ".pill-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }\n"
@@ -235,7 +234,6 @@ if nav_choice == "🏠 Home":
 
     st.markdown("### Visual Workflow Diagram")
     
-    # Rendered HTML Workflow Diagram replacing plain text blocks
     workflow_html_home = """
     <div class="workflow-container">
         <div class="step-title">1. INPUT & IMAGE PREPROCESSING</div>
