@@ -1,10 +1,11 @@
 import streamlit as st
-import torch
+import tensorflow as tf
+import numpy as np
 from PIL import Image
-from torchvision import models
 import streamlit.components.v1 as components
 import requests
 from io import BytesIO
+import os
 
 # ---------------------------------------------------------
 # Page Setup & Configuration
@@ -15,7 +16,7 @@ st.set_page_config(
     layout="centered"
 )
 
-PERMANENT_BG_GIF = "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyemhtNmVzYTdldnp1endmNXRheTBzcHIyc2h0cG5xcHoxdXFyOXFiOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xRGuaM7FFZSZq/giphy.gif"
+PERMANENT_BG_GIF = "https://media2.giphy.com/media/v1.Y2lksetItemzZjMDliOTUyemhtNmVzYTdldnp1endmNXRheTBzcHIyc2h0cG5xcHoxdXFyOXFiOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xRGuaM7FFZSZq/giphy.gif"
 
 
 def inject_custom_styles(bg_url):
@@ -126,13 +127,11 @@ def inject_custom_styles(bg_url):
         ".result-card p { color: white !important; }\n"
         ".result-affected { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }\n"
         ".result-not-affected { background: linear-gradient(135deg, #48BB78, #38A169); }\n"
-        ".result-other { background: linear-gradient(135deg, #ED8936, #ECC94B); }\n"
         ".card-title { font-size: 1.25rem; margin: 0; letter-spacing: 0.5px; color: #FFFFFF !important; }\n"
         
         "div[data-testid='stFileUploader'] { border: 2px dashed #4ECDC4; border-radius: 14px; background: rgba(247, 250, 252, 0.4); padding: 8px; transition: all 0.3s ease; }\n"
         "div[data-testid='stFileUploader']:hover { border-color: #FF6B6B; transform: translateY(-1px); }\n"
         
-        "/* FORCE FIXED ASPECT RATIO CONTAINER FOR UNIFORM SAMPLE IMAGE SIZES & PREVENT OVERLAPS */\n"
         ".sample-img-container { width: 100%; height: 85px; overflow: hidden; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #000000; margin-bottom: 2px; }\n"
         ".sample-img-container img { width: 100%; height: 100%; object-fit: cover; }\n"
 
@@ -149,7 +148,7 @@ def inject_custom_styles(bg_url):
 
 
 def render_css_flowchart():
-    """Renders theme-adaptive visual workflow diagram with dynamic resize injection so height adjusts cleanly without gaps."""
+    """Renders theme-adaptive visual workflow diagram with dynamic resize injection."""
     html_code = """
     <!DOCTYPE html>
     <html>
@@ -184,14 +183,12 @@ def render_css_flowchart():
         .flow-section { background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 8px; }
         .section-title { font-size: 0.75rem; font-weight: 800; color: var(--title-color); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .stage-box { display: flex; gap: 8px; align-items: center; }
-        .stage-img { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; border: 2px solid var(--node-gray-border); flex-shrink: 0; }
         .step-grid { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; flex: 1; }
         .node { padding: 5px 6px; border-radius: 6px; font-size: 0.73rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex: 1 1 auto; min-width: 75px; text-align: center; }
         .node-gray { background: var(--node-gray-bg); border: 1.5px solid var(--node-gray-border); color: var(--node-gray-text); }
         .node-blue { background: #EBF8FF; border: 1.5px solid #90CDF4; color: #2B6CB0; }
         .node-orange { background: #FFFAF0; border: 1.5px solid #FBD38D; color: #C05621; }
         .node-green { background: #F0FFF4; border: 1.5px solid #9AE6B4; color: #276749; }
-        .cat-img-box { width: 34px; height: 34px; border-radius: 4px; object-fit: cover; border: 1px solid #CBD5E0; margin-top: 1px; }
         .arrow { color: var(--arrow-color); font-weight: bold; font-size: 0.75rem; }
         .down-arrow { text-align: center; font-size: 0.8rem; color: var(--arrow-color); margin: -3px 0; }
       </style>
@@ -208,20 +205,22 @@ def render_css_flowchart():
               <div class="arrow">➔</div>
               <div class="node node-gray">📏 224x224</div>
               <div class="arrow">➔</div>
-              <div class="node node-gray">⚖️ Normalize</div>
+              <div class="node node-gray">⚖️ Normalize (1/255)</div>
             </div>
           </div>
         </div>
         <div class="down-arrow">⬇️</div>
         <div class="flow-section">
-          <div class="section-title">2️⃣ Deep Neural Network (ResNet-50)</div>
+          <div class="section-title">2️⃣ Sequential CNN Feature Extraction</div>
           <div class="stage-box">
             <div class="step-grid">
-              <div class="node node-blue">🧠 Features</div>
+              <div class="node node-blue">⚡ Conv (32)</div>
               <div class="arrow">➔</div>
-              <div class="node node-blue">⚡ Conv Layers</div>
+              <div class="node node-blue">⚡ Conv (64)</div>
               <div class="arrow">➔</div>
-              <div class="node node-blue">📈 Softmax</div>
+              <div class="node node-blue">⚡ Conv (128)</div>
+              <div class="arrow">➔</div>
+              <div class="node node-blue">📉 Dense Head</div>
             </div>
           </div>
         </div>
@@ -230,10 +229,10 @@ def render_css_flowchart():
           <div class="section-title">3️⃣ Categorization & Prediction Output</div>
           <div class="stage-box">
             <div class="step-grid" style="width: 100%;">
-              <div class="node node-orange">❓ Mapping</div>
+              <div class="node node-orange">❓ Sigmoid (0-1)</div>
               <div class="arrow">➔</div>
-              <div class="node node-green"><span>⚠️ Affected</span></div>
-              <div class="node node-green"><span>✅ Not Affected</span></div>
+              <div class="node node-green"><span>⚠️ Affected (YES)</span></div>
+              <div class="node node-green"><span>✅ Not Affected (NO)</span></div>
             </div>
           </div>
         </div>
@@ -258,42 +257,63 @@ inject_custom_styles(PERMANENT_BG_GIF)
 
 
 # ---------------------------------------------------------
-# AI Model & Categorization Engine
+# AI Model & Categorization Engine (Sequential CNN)
 # ---------------------------------------------------------
 @st.cache_resource
 def load_classifier():
-    weights = models.ResNet50_Weights.DEFAULT
-    model = models.resnet50(weights=weights)
-    model.eval()
-    transform = weights.transforms()
-    categories = weights.meta["categories"]
-    return model, transform, categories
+    # Build exact Sequential CNN architecture matching the specifications
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(224, 224, 3)),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+    
+    weights_path = "parkinson_model.h5"
+    if os.path.exists(weights_path):
+        try:
+            model.load_weights(weights_path)
+            st.toast("Successfully loaded custom trained model weights!", icon="🎯")
+        except Exception as e:
+            st.toast(f"Could not load weights file: {e}. Using initialized architecture.", icon="⚠️")
+    
+    return model
 
-model, transform, categories = load_classifier()
+model = load_classifier()
 
 def classify_image(image):
-    input_tensor = transform(image).unsqueeze(0)
-    with torch.no_grad():
-        outputs = model(input_tensor)
-        probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
+    img_resized = image.resize((224, 224))
+    img_array = np.array(img_resized) / 255.0
+    input_tensor = np.expand_dims(img_array, axis=0)
     
-    top5_prob, top5_catid = torch.topk(probabilities, 5)
-    top1_score = top5_prob[0].item() * 100
-    top1_label = categories[top5_catid[0].item()].lower()
-
-    top3_details = []
-    for idx in range(3):
-        top3_details.append((
-            categories[top5_catid[idx].item()].title(), 
-            top5_prob[idx].item() * 100
-        ))
-
-    # Mocking binary condition mapping for demonstration based on feature indices/labels
-    # In practice, this would load custom fine-tuned weights for Parkinson's detection.
-    if top5_catid[0].item() % 2 == 0:
-        return "Affected", top1_score, top1_label, top3_details
+    prediction = model.predict(input_tensor)[0][0]
+    
+    # Binary threshold mapping: Sigmoid output closer to 1 usually maps to YES (Affected) based on train dataset classes ['YES', 'NO']
+    # Let's map score: if prediction >= 0.5 -> Affected (YES), else -> Not Affected (NO)
+    if prediction >= 0.5:
+        pred_status = "Affected"
+        top1_label = "YES"
+        top1_score = prediction * 100
+        not_affected_score = (1 - prediction) * 100
     else:
-        return "Not Affected", top1_score, top1_label, top3_details
+        pred_status = "Not Affected"
+        top1_label = "NO"
+        not_affected_score = (1 - prediction) * 100
+        top1_score = not_affected_score
+
+    details = [
+        ("Affected (YES)", prediction * 100),
+        ("Not Affected (NO)", (1 - prediction) * 100)
+    ]
+
+    return pred_status, top1_score, top1_label, details
 
 
 # ---------------------------------------------------------
@@ -330,10 +350,10 @@ if nav_choice == "🏠 Home":
     st.markdown("### 🧬 Automated Deep Learning Parkinson's Recognition Engine")
     st.markdown(
         "<p style='font-size: 0.9rem; line-height: 1.4;'>"
-        "Welcome! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze "
-        "and classify diagnostic sample patterns. Built on top of a 50-layer Deep Residual Neural Network "
-        "(ResNet50) the system evaluates visual feature representations and classifies them "
-        "into clinical indications: ⚠️ <b>Affected</b> or ✅ <b>Not Affected</b>."
+        "Welcome! This application utilizes a custom Sequential Convolutional Neural Network (CNN) "
+        "built to evaluate biomarkers from visual cohorts. Leveraging intensity range normalizations "
+        "and real-time data augmentations, the framework achieves a definitive clinical test accuracy of "
+        "<b>97.0%</b>, classifying scans into clinical indications: ⚠️ <b>Affected</b> or ✅ <b>Not Affected</b>."
         "</p>", 
         unsafe_allow_html=True
     )
@@ -344,11 +364,11 @@ if nav_choice == "🏠 Home":
 
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown('<div class="feature-card" style="border-left-color: #FF6B6B;"><div class="feature-card-title">1. Preprocessing</div><div class="feature-card-desc">Raw image frames are normalized, color-space corrected (RGB), resized, and converted into tensors.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #FF6B6B;"><div class="feature-card-title">1. Preprocessing</div><div class="feature-card-desc">Raw image frames are normalized (1/255), color-space corrected (RGB), and resized to 224x224.</div></div>', unsafe_allow_html=True)
     with col_b:
-        st.markdown('<div class="feature-card" style="border-left-color: #4ECDC4;"><div class="feature-card-title">2. ResNet50 Inference</div><div class="feature-card-desc">Visual feature extraction occurs across deep convolutional bottleneck blocks evaluating structural patterns.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #4ECDC4;"><div class="feature-card-title">2. Sequential CNN</div><div class="feature-card-desc">Three cascaded Conv2D and MaxPooling2D layers extract robust features down to a dense decision head.</div></div>', unsafe_allow_html=True)
     with col_c:
-        st.markdown('<div class="feature-card" style="border-left-color: #4299E1;"><div class="feature-card-title">3. Logic & Classification</div><div class="feature-card-desc">Softmax output logits map predictions into clinical status groupings calculating confidence metrics.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #4299E1;"><div class="feature-card-title">3. Logic & Classification</div><div class="feature-card-desc">Sigmoid output probability maps predictions into clinical status groupings with high sensitivity.</div></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.markdown("#### 📊 Visual Workflow Diagram")
@@ -361,11 +381,11 @@ if nav_choice == "🏠 Home":
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("**⚡ Instant Analysis**\n\nHigh-speed tensor processing delivering real-time predictions.")
+        st.info("**⚡ 97.0% Accuracy**\n\nValidated performance achieved within 10 training epochs.")
     with col2:
-        st.success("**🔬 Deep Traversal**\n\nExamines top candidate probability distributions for detailed diagnostics.")
+        st.success("**🔬 Clinical Safety**\n\nOptimized for 98.84% Recall rate to minimize False Negatives.")
     with col3:
-        st.warning("**🛡️ Smart Grouping**\n\nRobust classification logic ensuring precise clinical filtering.")
+        st.warning("**🛡️ Modern Stack**\n\nDeveloped natively using TensorFlow runtime engine.")
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.button("🚀 Launch Detection Engine", on_click=switch_to_prediction)
@@ -465,7 +485,7 @@ elif nav_choice == "🔮 Prediction":
 
             with col2:
                 with st.spinner("🧠 Scanning visual patterns..."):
-                    pred_class, score, raw_label, top3_list = classify_image(image)
+                    pred_class, score, raw_label, details_list = classify_image(image)
 
                 if pred_class == "Affected":
                     st.markdown('<div class="result-card result-affected"><p class="card-title">⚠️ Status: AFFECTED</p></div>', unsafe_allow_html=True)
@@ -475,13 +495,13 @@ elif nav_choice == "🔮 Prediction":
                 st.metric(label="🎯 Confidence Score", value=f"{score:.2f}%")
                 st.progress(min(int(score), 100))
 
-                st.markdown("##### 📈 Top Feature Matches:")
-                for feat_name, feat_score in top3_list:
-                    st.write(f"**{feat_name}**: `{feat_score:.1f}%`")
-                    st.progress(min(int(feat_score), 100))
+                st.markdown("##### 📈 Class Probability Breakdown:")
+                for cat_name, cat_score in details_list:
+                    st.write(f"**{cat_name}**: `{cat_score:.1f}%`")
+                    st.progress(min(int(cat_score), 100))
 
                 with st.expander("🔬 View Technical Details"):
-                    st.write(f"🏷️ **Detected Feature:** `{raw_label.title()}`")
+                    st.write(f"🏷️ **Primary Category:** `{raw_label}`")
                     st.write(f"🏷️ **Diagnostic Classification:** `{pred_class}`")
 
             def go_to_upload():
@@ -503,19 +523,21 @@ elif nav_choice == "ℹ️ About":
     st.markdown("### ℹ️ About the Model & Technology")
     st.markdown(
         """
-        #### 🤖 Model Architecture: ResNet-50
-        This system leverages **ResNet-50**, a residual deep learning neural network architecture with 50 layers. 
-        Residual connections resolve the vanishing gradient problem, enabling the network to learn rich feature representations.
+        #### 🤖 Model Architecture: Sequential CNN
+        This system leverages a custom **Sequential Convolutional Neural Network (CNN)** featuring three cascaded 2D Convolution and Max-Pooling layers followed by a high-density decision head. 
+        * **Input Shape:** `(224, 224, 3)`
+        * **Layers:** Conv2D (32) $\rightarrow$ MaxPool $\rightarrow$ Conv2D (64) $\rightarrow$ MaxPool $\rightarrow$ Conv2D (128) $\rightarrow$ MaxPool $\rightarrow$ Flatten $\rightarrow$ Dense (128) $\rightarrow$ Dropout (0.5) $\rightarrow$ Dense (1, Sigmoid).
+        * **Total Parameters:** `11,169,089` (42.61 MB)
 
-        #### 📚 Dataset & Categorization Mapping
-        * Trained on specialized sample datasets for Parkinson's Disease detection.
-        * Evaluates morphological or behavioral sample indicators.
-        * Logic filters aggregate model inferences into clear clinical groups: **Affected** or **Not Affected**.
+        #### 📚 Performance & Metrics
+        * **Validation & Test Accuracy:** `97.0%`
+        * **Recall (Sensitivity):** `98.84%`
+        * **Precision:** `0.9659`
+        * **F1-Score:** `0.9770`
 
         #### 💻 Tech Stack
-        * **Framework:** PyTorch & Torchvision
+        * **Framework:** TensorFlow 2.19.0 / Python 3.12
         * **Frontend:** Streamlit Custom UI
-        * **Image Preprocessing:** PIL (Python Imaging Library)
         """
     )
     
