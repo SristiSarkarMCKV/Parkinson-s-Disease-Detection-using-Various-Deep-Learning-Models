@@ -196,7 +196,7 @@ inject_custom_styles(PERMANENT_BG_GIF)
 
 
 # ---------------------------------------------------------
-# Enhanced Model Training Engine (Optimized for Streamlit Cloud execution timeouts)
+# Enhanced Model Training Engine (Optimized for 10 Epochs)
 # ---------------------------------------------------------
 @st.cache_resource
 def get_trained_model():
@@ -206,7 +206,7 @@ def get_trained_model():
         st.toast("Loading verified clinical model weights...", icon="🩺")
         return tf.keras.models.load_model(model_path)
 
-    st.warning("Initializing lightweight training pipeline to comply with resource limits...")
+    st.warning("Initializing pipeline and training for 10 epochs with resource-optimized batch structures...")
 
     os.makedirs("dataset", exist_ok=True)
     gdrive_url = "https://drive.google.com/uc?id=152qN11WKtE-2LstEXOMOLaoTw0o3HTaL"
@@ -232,7 +232,7 @@ def get_trained_model():
         st.error(f"Directory path error: {train_dir}")
         return None
 
-    # Optimized batch size and validation split to prevent memory/timeout limits on free tiers
+    # Optimized batch size (128) and streamlined image dimensions / lighter architecture to complete 10 epochs safely within runtime limits
     train_datagen = ImageDataGenerator(
         rescale=1.0/255,
         rotation_range=10,
@@ -244,23 +244,23 @@ def get_trained_model():
 
     train_generator = train_datagen.flow_from_directory(
         train_dir,
-        target_size=(224, 224),
-        batch_size=64,
+        target_size=(128, 128),
+        batch_size=128,
         class_mode='binary',
         subset='training'
     )
 
     val_generator = train_datagen.flow_from_directory(
         train_dir,
-        target_size=(224, 224),
-        batch_size=64,
+        target_size=(128, 128),
+        batch_size=128,
         class_mode='binary',
         subset='validation'
     )
 
-    # Streamlined CNN structure for rapid cloud execution
+    # Lightweight CNN design structured to sustain 10 full epochs efficiently
     model = Sequential([
-        Input(shape=(224, 224, 3)),
+        Input(shape=(128, 128, 3)),
         Conv2D(32, (3, 3), padding='same', activation='relu'),
         BatchNormalization(),
         MaxPooling2D(2, 2),
@@ -274,8 +274,8 @@ def get_trained_model():
         MaxPooling2D(2, 2),
         
         Flatten(),
-        Dense(128, activation='relu'),
-        Dropout(0.4),
+        Dense(64, activation='relu'),
+        Dropout(0.3),
         Dense(1, activation='sigmoid')
     ])
 
@@ -285,26 +285,25 @@ def get_trained_model():
         metrics=['accuracy']
     )
 
-    # Accelerated single-epoch fitting or minimal epochs to prevent worker timeouts
-    lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=1, factor=0.5, min_lr=1e-5, verbose=1)
-    early_stopping = EarlyStopping(monitor='accuracy', patience=2, restore_best_weights=True, verbose=1)
+    lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=2, factor=0.5, min_lr=1e-5, verbose=1)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=4, restore_best_weights=True, verbose=1)
 
-    with st.spinner("Executing rapid training across epochs..."):
+    with st.spinner("Executing optimized training sequence across 10 epochs..."):
         model.fit(
             train_generator,
-            epochs=3,
+            epochs=10,
             validation_data=val_generator,
             callbacks=[lr_reduction, early_stopping]
         )
 
     model.save(model_path)
-    st.success("Model trained and calibrated successfully!")
+    st.success("Model trained successfully across 10 epochs!")
     return model
 
 model = get_trained_model()
 
 def classify_image(image):
-    img_resized = image.resize((224, 224))
+    img_resized = image.resize((128, 128))
     img_array = img_to_array(img_resized)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = img_array / 255.0
@@ -379,7 +378,7 @@ if nav_choice == "🏠 Overview":
 
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown('<div class="feature-card"><div class="feature-card-title">1. Ingestion & Preprocessing</div><div class="feature-card-desc">Standardizes input resolution to 224x224 pixels with rigorous pixel-range scaling.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card"><div class="feature-card-title">1. Ingestion & Preprocessing</div><div class="feature-card-desc">Standardizes input resolution to 128x128 pixels with rigorous pixel-range scaling.</div></div>', unsafe_allow_html=True)
     with col_b:
         st.markdown('<div class="feature-card"><div class="feature-card-title">2. Deep Convolution</div><div class="feature-card-desc">Extracts complex spatial biomarker signatures through multi-layer convolutional feature maps.</div></div>', unsafe_allow_html=True)
     with col_c:
@@ -525,7 +524,7 @@ elif nav_choice == "ℹ️ Clinical Reference":
         """
         #### 🤖 Neural Network Specifications
         * **Backbone:** Custom Deep Convolutional Architecture with Batch Normalization.
-        * **Input Resolution:** `224 x 224 x 3` RGB tensor.
+        * **Input Resolution:** `128 x 128 x 3` RGB tensor.
         * **Optimization:** Adam Optimizer with adaptive learning rate reduction and early stopping mechanisms.
         """
     )
