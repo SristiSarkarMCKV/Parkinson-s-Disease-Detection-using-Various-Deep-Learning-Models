@@ -242,6 +242,33 @@ if nav_choice == "🏠 Home":
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
+    st.markdown(
+        """
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.5); border-radius: 20px; padding: 20px; color: #F8FAFC; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #A5B4FC; margin-bottom: 14px; text-align: center; letter-spacing: 0.5px;">End-to-End Diagnostic Pipeline</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; font-size: 0.78rem; font-weight: 600;">
+                <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">📥</div>
+                    <div style="color: #C7D2FE; font-weight: 700; margin-bottom: 2px;">1. Preprocessing</div>
+                    <div>Raw images are resized (224x224), normalized, and converted into tensors.</div>
+                </div>
+                <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">⚙️</div>
+                    <div style="color: #DDD6FE; font-weight: 700; margin-bottom: 2px;">2. CNN Inference</div>
+                    <div>Feature extraction via cascaded Conv2D & Max-Pooling layers.</div>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">🎯</div>
+                    <div style="color: #A7F3D0; font-weight: 700; margin-bottom: 2px;">3. Logic & Classification</div>
+                    <div>Sigmoid classification head outputs clinical confidence scores.</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown("### 📊 Visual Workflow Diagram")
     
     workflow_html_home = """
@@ -564,12 +591,6 @@ elif nav_choice == "ℹ️ About":
     st.markdown("---")
     st.markdown("### 🚀 Model Deployment & Single-Image Inference")
     st.markdown("The framework ships with an integrated prediction pipeline to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.")
-    st.code(
-        "Classes found in test directory: ['YES', 'NO']\n"
-        "1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 202ms/step\n"
-        "Prediction: Parkinson Detected | Confidence Score: 0.9842",
-        language="bash"
-    )
     
     st.markdown("---")
     st.markdown("### 👩‍💻 Developer Details")
