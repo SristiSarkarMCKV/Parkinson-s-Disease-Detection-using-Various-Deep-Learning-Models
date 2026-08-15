@@ -17,7 +17,7 @@ st.set_page_config(
     layout="centered"
 )
 
-PERMANENT_BG_GIF = "https://giphy.com/gifs/trippy-brain-mri-38tjCITcNUmWc"
+PERMANENT_BG_GIF = "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyMm02ZzkxZXZuemF5MGVwcm9naXE0cXYyOHhla2QxZnA5M2xpNWVhaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZyqVInhQOJIMHnR0gp/giphy.gif"
 
 def inject_custom_styles(bg_url):
     css = (
@@ -34,7 +34,7 @@ def inject_custom_styles(bg_url):
         "::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366F1, #8B5CF6, #EC4899); border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.25); }\n"
         
         ".stApp {\n"
-        "  background-image: linear-gradient(rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.82)), url('" + bg_url + "');\n"
+        "  background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('" + bg_url + "');\n"
         "  background-attachment: fixed;\n"
         "  background-size: cover;\n"
         "  background-position: center;\n"
@@ -45,83 +45,85 @@ def inject_custom_styles(bg_url):
         "}\n"
         
         ".block-container {\n"
-        "  background: rgba(255, 255, 255, 0.96);\n"
+        "  background: rgba(255, 255, 255, 0.97);\n"
         "  color: #1A202C;\n"
-        "  border-radius: 28px;\n"
-        "  padding: 32px 28px !important;\n"
+        "  border-radius: 32px;\n"
+        "  padding: 36px 32px !important;\n"
         "  margin: auto !important;\n"
-        "  max-width: 820px;\n"
+        "  max-width: 860px;\n"
         "  width: 100%;\n"
-        "  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);\n"
-        "  backdrop-filter: blur(16px);\n"
-        "  border: 1px solid rgba(255, 255, 255, 0.4);\n"
+        "  box-shadow: 0 30px 70px rgba(99, 102, 241, 0.25);\n"
+        "  backdrop-filter: blur(20px);\n"
+        "  border: 2px solid rgba(99, 102, 241, 0.2);\n"
         "}\n"
 
         ".content-section { margin-top: 28px !important; margin-bottom: 0px !important; }\n"
         "div.element-container { margin-bottom: 8px !important; margin-top: 8px !important; }\n"
         "div[data-testid='stVerticalBlock'] { gap: 0.9rem !important; }\n"
-        "h3 { margin-top: 18px !important; margin-bottom: 0.5rem !important; }\n"
-        "h4 { margin-top: 14px !important; margin-bottom: 0.4rem !important; }\n"
-        "p { margin-bottom: 0.6rem !important; margin-top: 0px !important; line-height: 1.5 !important; }\n"
+        "h3 { margin-top: 18px !important; margin-bottom: 0.5rem !important; color: #4F46E5 !important; font-family: 'Outfit', sans-serif !important; font-weight: 800 !important; }\n"
+        "h4 { margin-top: 14px !important; margin-bottom: 0.4rem !important; color: #7C3AED !important; font-family: 'Outfit', sans-serif !important; }\n"
+        "p { margin-bottom: 0.6rem !important; margin-top: 0px !important; line-height: 1.6 !important; }\n"
 
-        "div[data-testid='stAlert'] { color: #1A202C !important; font-weight: 500; border-radius: 12px; margin-bottom: 0.6rem !important; margin-top: 0.4rem !important; }\n"
+        "div[data-testid='stAlert'] { color: #1A202C !important; font-weight: 500; border-radius: 14px; margin-bottom: 0.6rem !important; margin-top: 0.4rem !important; border: 1px solid #C7D2FE !important; }\n"
         "div[data-testid='stAlert'] p { color: #1A202C !important; font-weight: 500; }\n"
-        "div[data-testid='stAlert'] strong { color: #000000 !important; font-weight: 800; }\n"
+        "div[data-testid='stAlert'] strong { color: #4338CA !important; font-weight: 800; }\n"
         
         "@media (prefers-color-scheme: dark) {\n"
         "  .block-container {\n"
-        "    background: rgba(15, 23, 42, 0.93) !important;\n"
-        "    color: #F7FAFC !important;\n"
-        "    border: 1px solid rgba(255, 255, 255, 0.15);\n"
+        "    background: rgba(15, 23, 42, 0.95) !important;\n"
+        "    color: #F8FAFC !important;\n"
+        "    border: 2px solid rgba(129, 140, 248, 0.3);\n"
         "  }\n"
         "  .sub-text { color: #CBD5E0 !important; }\n"
-        "  .feature-card { background: #1E293B !important; border-color: #334155 !important; }\n"
+        "  .feature-card { background: #1E293B !important; border-color: #475569 !important; }\n"
         "  .feature-card-title { color: #F8FAFC !important; }\n"
         "  .feature-card-desc { color: #CBD5E0 !important; }\n"
-        "  div[data-testid='stRadio'] label { background: rgba(30, 41, 59, 0.9) !important; color: #F1F5F9 !important; border-color: #475569 !important; }\n"
-        "  p, span, label, h1, h2, h3, h4, h5, h6 { color: #F1F5F9 !important; }\n"
+        "  div[data-testid='stRadio'] label { background: rgba(30, 41, 59, 0.95) !important; color: #F1F5F9 !important; border-color: #475569 !important; }\n"
+        "  p, span, label, h3, h4 { color: #F1F5F9 !important; }\n"
         "  div[data-testid='stAlert'] { background-color: #1E293B !important; color: #F1F5F9 !important; border-color: #475569 !important; }\n"
         "  div[data-testid='stAlert'] p { color: #F1F5F9 !important; }\n"
-        "  div[data-testid='stAlert'] strong { color: #FFFFFF !important; }\n"
+        "  div[data-testid='stAlert'] strong { color: #818CF8 !important; }\n"
         "}\n"
 
-        ".main-title { font-family: 'Outfit', sans-serif; text-align: center; background: linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; font-weight: 900; margin-bottom: 4px; padding-bottom: 0px; letter-spacing: -0.5px; }\n"
-        ".sub-text { font-family: 'Poppins', sans-serif; text-align: center; font-size: 0.95rem; color: #4A5568; font-weight: 500; line-height: 1.4; margin-bottom: 12px; }\n"
+        ".main-title { font-family: 'Outfit', sans-serif; text-align: center; background: linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.3rem; font-weight: 900; margin-bottom: 6px; padding-bottom: 0px; letter-spacing: -0.5px; }\n"
+        ".sub-text { font-family: 'Poppins', sans-serif; text-align: center; font-size: 1rem; color: #4B5563; font-weight: 500; line-height: 1.5; margin-bottom: 14px; }\n"
         
-        "div[data-testid='stRadio'] > div { justify-content: center; gap: 12px; border: none !important; margin-bottom: 6px; margin-top: 6px; }\n"
-        "div[data-testid='stRadio'] label { background: rgba(240, 244, 248, 0.85); border: 1px solid #CBD5E0; border-radius: 12px; padding: 6px 16px; font-family: 'Outfit', sans-serif; font-weight: 700; transition: all 0.2s ease-in-out; color: #2D3748; }\n"
-        "div[data-testid='stRadio'] label:hover { border-color: #6366F1; background: #FFFFFF; }\n"
+        "div[data-testid='stRadio'] > div { justify-content: center; gap: 14px; border: none !important; margin-bottom: 8px; margin-top: 8px; }\n"
+        "div[data-testid='stRadio'] label { background: linear-gradient(135deg, rgba(240, 244, 248, 0.9), rgba(238, 242, 255, 0.9)); border: 1.5px solid #C7D2FE; border-radius: 14px; padding: 8px 20px; font-family: 'Outfit', sans-serif; font-weight: 700; transition: all 0.25s ease-in-out; color: #374151; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08); }\n"
+        "div[data-testid='stRadio'] label:hover { border-color: #6366F1; background: #FFFFFF; transform: translateY(-2px); }\n"
         
-        ".feature-card { background: #F8FAFC; border-radius: 14px; padding: 14px; border-left: 5px solid #6366F1; height: 100%; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }\n"
-        ".feature-card-title { font-family: 'Outfit', sans-serif; font-weight: 800; color: #2D3748; font-size: 1rem; margin-bottom: 4px; }\n"
-        ".feature-card-desc { color: #4A5568; font-size: 0.85rem; line-height: 1.4; }\n"
+        ".feature-card { background: linear-gradient(135deg, #F8FAFC, #EEF2FF); border-radius: 16px; padding: 16px; border-left: 6px solid #6366F1; height: 100%; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.08); transition: all 0.3s ease; }\n"
+        ".feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.15); }\n"
+        ".feature-card-title { font-family: 'Outfit', sans-serif; font-weight: 800; color: #1E293B; font-size: 1.05rem; margin-bottom: 6px; }\n"
+        ".feature-card-desc { color: #4B5563; font-size: 0.88rem; line-height: 1.45; }\n"
         
-        ".result-card { border-radius: 16px; padding: 16px; text-align: center; color: white !important; font-family: 'Outfit', sans-serif; font-weight: 800; margin-bottom: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }\n"
+        ".result-card { border-radius: 18px; padding: 18px; text-align: center; color: white !important; font-family: 'Outfit', sans-serif; font-weight: 800; margin-bottom: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }\n"
         ".result-card p { color: white !important; }\n"
         ".result-positive { background: linear-gradient(135deg, #EF4444, #DC2626); }\n"
         ".result-healthy { background: linear-gradient(135deg, #10B981, #059669); }\n"
-        ".card-title { font-size: 1.3rem; margin: 0; letter-spacing: 0.5px; color: #FFFFFF !important; }\n"
+        ".card-title { font-size: 1.35rem; margin: 0; letter-spacing: 0.5px; color: #FFFFFF !important; }\n"
         
-        "div[data-testid='stFileUploader'] { border: 2px dashed #6366F1; border-radius: 16px; background: rgba(247, 250, 252, 0.4); padding: 12px; transition: all 0.3s ease; }\n"
-        "div[data-testid='stFileUploader']:hover { border-color: #8B5CF6; transform: translateY(-1px); }\n"
+        "div[data-testid='stFileUploader'] { border: 2.5px dashed #6366F1; border-radius: 18px; background: rgba(247, 250, 252, 0.6); padding: 16px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05); }\n"
+        "div[data-testid='stFileUploader']:hover { border-color: #8B5CF6; background: rgba(238, 242, 255, 0.4); transform: translateY(-2px); }\n"
         
-        ".sample-img-container { width: 100%; height: 95px; overflow: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #000000; margin-bottom: 4px; }\n"
-        ".sample-img-container img { width: 100%; height: 100%; object-fit: cover; }\n"
+        ".sample-img-container { width: 100%; height: 105px; overflow: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #000000; margin-bottom: 6px; border: 2px solid #C7D2FE; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }\n"
+        ".sample-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }\n"
+        ".sample-img-container img:hover { transform: scale(1.05); }\n"
 
-        ".stButton>button { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white !important; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; border-radius: 10px; border: none; padding: 6px 10px; width: 100%; min-height: 42px; line-height: 1.2; transition: all 0.3s ease; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35); }\n"
-        ".stButton>button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5); }\n"
+        ".stButton>button { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white !important; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.82rem; border-radius: 12px; border: none; padding: 8px 12px; width: 100%; min-height: 44px; line-height: 1.2; transition: all 0.3s ease; box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }\n"
+        ".stButton>button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(99, 102, 241, 0.55); background: linear-gradient(135deg, #4F46E5, #7C3AED); }\n"
         
-        "[data-testid='stMetricValue'] { font-family: 'Outfit', sans-serif; font-size: 1.8rem !important; color: #6366F1 !important; font-weight: 800; }\n"
-        "hr { margin: 16px 0 !important; border-color: #E2E8F0 !important; }\n"
+        "[data-testid='stMetricValue'] { font-family: 'Outfit', sans-serif; font-size: 1.9rem !important; color: #6366F1 !important; font-weight: 900; }\n"
+        "hr { margin: 18px 0 !important; border-color: #E2E8F0 !important; }\n"
         
-        ".workflow-container { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(226, 232, 240, 0.2); padding: 16px; border-radius: 12px; margin-bottom: 12px; }\n"
-        ".step-title { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 800; color: #6366F1; margin-bottom: 8px; }\n"
-        ".pill-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }\n"
-        ".pill-box-primary { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }\n"
-        ".pill-box-secondary { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(148, 163, 184, 0.2); color: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }\n"
-        ".arrow-separator { color: #94A38B; font-weight: bold; }\n"
+        ".workflow-container { background: rgba(99, 102, 241, 0.06); border: 1.5px solid rgba(99, 102, 241, 0.2); padding: 18px; border-radius: 14px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.04); }\n"
+        ".step-title { font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 800; color: #4F46E5; margin-bottom: 10px; }\n"
+        ".pill-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }\n"
+        ".pill-box-primary { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; padding: 7px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3); }\n"
+        ".pill-box-secondary { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); color: #f8fafc; padding: 7px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; }\n"
+        ".arrow-separator { color: #6366F1; font-weight: 900; font-size: 1.1rem; }\n"
         ".divider-line { text-align: center; margin: 8px 0; }\n"
-        ".divider-badge { background: rgba(99, 102, 241, 0.2); color: #818cf8; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; }\n"
+        ".divider-badge { background: rgba(99, 102, 241, 0.2); color: #4F46E5; padding: 3px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; }\n"
         "</style>"
     )
     st.markdown(css, unsafe_allow_html=True)
@@ -218,25 +220,33 @@ def get_raw_github_url(github_url):
 # PAGE 1: HOME PAGE
 # =========================================================
 if nav_choice == "🏠 Home":
-    st.markdown("### Automated Deep Learning Parkinson Detection Engine")
+    st.markdown("### 🚀 Automated Deep Learning Parkinson Detection Engine")
     st.markdown(
-        "<p style='font-size: 0.95rem; line-height: 1.5;'>"
-        "Welcome! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze and classify "
+        "<p style='font-size: 1rem; line-height: 1.6;'>"
+        "✨ Welcome to the advanced medical screening portal! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze and classify "
         "medical brain scans. Built on top of a custom Sequential Convolutional Neural Network (CNN), the system evaluates visual "
-        "feature representations and leverages intensity range normalizations to output high-precision clinical screening verdicts."
+        "feature representations and leverages intensity range normalizations to output high-precision clinical screening verdicts 🎯."
         "</p>", 
         unsafe_allow_html=True
     )
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### Classification System Architecture & Workflow")
+    st.markdown("### ⚙️ Classification System Architecture & Workflow")
+    st.markdown(
+        "<p style='font-size: 0.95rem; line-height: 1.5;'>"
+        "The classification pipeline is engineered into distinct computational stages designed to maximize diagnostic reliability. "
+        "Every incoming scan undergoes automated dimension normalization, feature extraction via cascaded convolutional layers, "
+        "and probability mapping via dense classification heads to render robust clinical screening output."
+        "</p>",
+        unsafe_allow_html=True
+    )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("### Visual Workflow Diagram")
+    st.markdown("### 📊 Visual Workflow Diagram")
     
     workflow_html_home = """
     <div class="workflow-container">
-        <div class="step-title">1. INPUT & IMAGE PREPROCESSING</div>
+        <div class="step-title">📥 1. INPUT & IMAGE PREPROCESSING</div>
         <div class="pill-row">
             <div class="pill-box-primary"><span>📥 Raw Input Source</span></div>
             <span class="arrow-separator">→</span>
@@ -247,7 +257,7 @@ if nav_choice == "🏠 Home":
     </div>
     <div class="divider-line"><span class="divider-badge">↓</span></div>
     <div class="workflow-container">
-        <div class="step-title">2. DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)</div>
+        <div class="step-title">🧬 2. DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)</div>
         <div class="pill-row">
             <div class="pill-box-primary"><span>🧬 Tensor Features</span></div>
             <span class="arrow-separator">→</span>
@@ -260,16 +270,16 @@ if nav_choice == "🏠 Home":
     st.html(workflow_html_home)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### Core Capabilities Highlight")
+    st.markdown("### ⭐ Core Capabilities Highlight")
     st.markdown('</div>', unsafe_allow_html=True)
 
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown('<div class="feature-card" style="border-left-color: #6366F1;"><div class="feature-card-title">Instant Analysis</div><div class="feature-card-desc">High-speed tensor processing delivering real-time screening predictions.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #6366F1;"><div class="feature-card-title">⚡ Instant Analysis</div><div class="feature-card-desc">High-speed tensor processing delivering real-time screening predictions with optimized latency.</div></div>', unsafe_allow_html=True)
     with col_b:
-        st.markdown('<div class="feature-card" style="border-left-color: #8B5CF6;"><div class="feature-card-title">Deep Traversal</div><div class="feature-card-desc">Examines top candidate probability distributions with high sensitivity.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #8B5CF6;"><div class="feature-card-title">🔬 Deep Traversal</div><div class="feature-card-desc">Examines top candidate probability distributions with high sensitivity and robust feature mapping.</div></div>', unsafe_allow_html=True)
     with col_c:
-        st.markdown('<div class="feature-card" style="border-left-color: #EC4899;"><div class="feature-card-title">Smart Filtering</div><div class="feature-card-desc">Robust validation logic ensuring precise medical scan inputs.</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card" style="border-left-color: #EC4899;"><div class="feature-card-title">🛡️ Smart Filtering</div><div class="feature-card-desc">Robust validation logic ensuring precise medical scan inputs before executing neural inference.</div></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.button("🚀 Launch Image Classifier Engine", on_click=switch_to_prediction)
@@ -282,13 +292,13 @@ elif nav_choice == "🔮 Prediction":
     if st.session_state.page == 'upload':
         st.markdown(
             "<p class='sub-text'>"
-            "Select an image source below. You can either upload a custom medical brain scan or choose from our "
-            "curated sample image suite for instant diagnostic evaluation."
+            "✨ Select an image source below. You can either upload a custom medical brain scan or choose from our "
+            "curated sample image suite for instant diagnostic evaluation 🔍."
             "</p>", 
             unsafe_allow_html=True
         )
 
-        st.markdown("**Source:**")
+        st.markdown("**📂 Source Selection:**")
         st.session_state.source_mode = st.radio(
             "Source",
             ["Upload Image", "Sample Images"],
@@ -298,7 +308,7 @@ elif nav_choice == "🔮 Prediction":
         )
 
         if st.session_state.source_mode == "Upload Image":
-            st.markdown("### 📥 Upload Test Image")
+            st.markdown("### 📥 Upload Test Image File")
             file = st.file_uploader(
                 "Choose an image file (JPG, JPEG, PNG)", 
                 type=["jpg", "jpeg", "png"],
@@ -314,7 +324,7 @@ elif nav_choice == "🔮 Prediction":
                 st.button("🚀 Analyze Image and View Results", on_click=go_to_results)
 
         else:
-            st.markdown("### Select a Curated Sample Image:")
+            st.markdown("### 🌟 Select a Curated Sample Image:")
             
             sample_images = {
                 "Sample 1": get_raw_github_url("https://github.com/SristiSarkarMCKV/Parkinson-s-Disease-Detection-using-Various-Deep-Learning-Models/blob/main/Sample/Affected/IMG_20260806_183520.jpg"),
@@ -332,18 +342,18 @@ elif nav_choice == "🔮 Prediction":
             
             for i in range(4):
                 with cols[i]:
-                    st.markdown(f"<div style='text-align: center; font-weight: 700; font-size: 0.75rem; margin-bottom: 4px;'>{sample_keys[i]}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; font-weight: 700; font-size: 0.78rem; margin-bottom: 4px; color: #4F46E5;'>✨ {sample_keys[i]}</div>", unsafe_allow_html=True)
                     st.markdown(f"<div class='sample-img-container'><img src='{sample_images[sample_keys[i]]}' /></div>", unsafe_allow_html=True)
-                    if st.button(f"Analyze S{i+1}", key=f"btn_{i}"):
+                    if st.button(f"🔍 Analyze S{i+1}", key=f"btn_{i}"):
                         st.session_state.selected_sample_url = sample_images[sample_keys[i]]
                         st.session_state.file_source_name = f"sample_{i+1}"
 
             cols_row2 = st.columns(4)
             for i in range(4, 8):
                 with cols_row2[i-4]:
-                    st.markdown(f"<div style='text-align: center; font-weight: 700; font-size: 0.75rem; margin-bottom: 4px;'>{sample_keys[i]}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; font-weight: 700; font-size: 0.78rem; margin-bottom: 4px; color: #4F46E5;'>✨ {sample_keys[i]}</div>", unsafe_allow_html=True)
                     st.markdown(f"<div class='sample-img-container'><img src='{sample_images[sample_keys[i]]}' /></div>", unsafe_allow_html=True)
-                    if st.button(f"Analyze S{i+1}", key=f"btn_{i}"):
+                    if st.button(f"🔍 Analyze S{i+1}", key=f"btn_{i}"):
                         st.session_state.selected_sample_url = sample_images[sample_keys[i]]
                         st.session_state.file_source_name = f"sample_{i+1}"
 
@@ -354,11 +364,11 @@ elif nav_choice == "🔮 Prediction":
                     st.session_state.page = 'results'
                     st.rerun()
                 except Exception as e:
-                    st.error(f"Error loading sample image: {e}")
+                    st.error(f"⚠️ Error loading sample image: {e}")
 
     elif st.session_state.page == 'results':
-        st.markdown("<h2 style='text-align: center; font-family: Outfit, sans-serif;'>📋 Screening Report</h2>", unsafe_allow_html=True)
-        st.markdown("<p class='sub-text'>Detailed findings and confidence metrics evaluated by the deep learning engine</p>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; font-family: Outfit, sans-serif; color: #4F46E5;'>📋 Comprehensive Screening Report</h2>", unsafe_allow_html=True)
+        st.markdown("<p class='sub-text'>✨ Detailed clinical findings and confidence metrics evaluated by the deep learning engine 🧠</p>", unsafe_allow_html=True)
         
         if st.session_state.uploaded_file is not None:
             image = Image.open(st.session_state.uploaded_file).convert("RGB")
@@ -396,7 +406,7 @@ elif nav_choice == "🔮 Prediction":
                     st.image(image, use_container_width=True)
 
                 with col2:
-                    with st.spinner("🧠 Evaluating feature tensors..."):
+                    with st.spinner("🧠 Evaluating feature tensors and neural weights..."):
                         pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
 
                     expected_output_text = "Unknown"
@@ -423,7 +433,7 @@ elif nav_choice == "🔮 Prediction":
                     )
                     st.markdown(progress_html, unsafe_allow_html=True)
 
-                    with st.expander("🔬 View Technical Details"):
+                    with st.expander("🔬 View Technical Diagnostic Details"):
                         if st.session_state.file_source_name and "sample_" in st.session_state.file_source_name:
                             st.write(f"📌 **Expected Output:** `{expected_output_text}`")
                         st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
@@ -436,9 +446,9 @@ elif nav_choice == "🔮 Prediction":
                     st.session_state.uploaded_file = None
                     st.session_state.selected_sample_url = None
                     st.session_state.file_source_name = None
-                st.button("🔄 Back to Selection", on_click=go_to_upload)
+                st.button("🔄 Back to Selection Portal", on_click=go_to_upload)
         else:
-            st.warning("No image found!")
+            st.warning("⚠️ No image file found in session!")
             def go_to_upload():
                 st.session_state.page = 'upload'
             st.button("⬅️ Back to Upload Page", on_click=go_to_upload)
@@ -447,27 +457,27 @@ elif nav_choice == "🔮 Prediction":
 # PAGE 3: ABOUT PAGE
 # =========================================================
 elif nav_choice == "ℹ️ About":
-    st.markdown("### Technical Specifications & Architecture")
+    st.markdown("### 🛠️ Technical Specifications & Architecture")
     st.markdown(
-        "An automated deep learning diagnostic pipeline built to evaluate biomarkers from visual cohorts "
-        "using custom Sequential Convolutional Neural Networks. Leveraging state-of-the-art intensity range normalizations "
-        "and real-time data augmentations, this framework achieves a definitive clinical test accuracy of **97.0%**."
+        "✨ An automated deep learning diagnostic pipeline built to evaluate biomarkers from visual cohorts "
+        "using custom Sequential Convolutional Neural Networks 🧬. Leveraging state-of-the-art intensity range normalizations "
+        "and real-time data augmentations, this framework achieves a definitive clinical test accuracy of **97.0%** 🎯."
     )
     
     st.markdown("---")
-    st.markdown("### Core Engineering Highlights")
+    st.markdown("### ⭐ Core Engineering Highlights")
     st.markdown(
-        "* **State-of-the-Art Accuracy:** Achieved **97.0% Validation & Test Accuracy** within 10 training epochs.\n"
-        "* **Clinical Safety First:** Optimizes for a **98.84% Recall rate** on positive cases to minimize dangerous False Negatives.\n"
-        "* **Modern Technical Stack:** Developed natively in Python 3.12 using the latest **TensorFlow 2.19.0** runtime engine."
+        "* 🚀 **State-of-the-Art Accuracy:** Achieved **97.0% Validation & Test Accuracy** within 10 training epochs.\n"
+        "* 🛡️ **Clinical Safety First:** Optimizes for a **98.84% Recall rate** on positive cases to minimize dangerous False Negatives.\n"
+        "* 💻 **Modern Technical Stack:** Developed natively in Python 3.12 using the latest **TensorFlow 2.19.0** runtime engine."
     )
 
     st.markdown("---")
-    st.markdown("### End-to-End Pipeline Steps")
+    st.markdown("### 🔄 End-to-End Pipeline Execution Steps")
     st.markdown("The repository maps directly to a rigorous execution architecture:")
     
     st.markdown(
-        "#### Environment & Path Configurations\n"
+        "#### 📂 Environment & Path Configurations\n"
         "Automatically unzips and validates the structural integrity of the workspace. Dynamically maps nested internal layouts into robust environmental paths:"
     )
     st.code(
@@ -478,7 +488,7 @@ elif nav_choice == "ℹ️ About":
     )
     
     st.markdown(
-        "#### Dataset Preparation & Augmentation Engine\n"
+        "#### ⚙️ Dataset Preparation & Augmentation Engine\n"
         "Uses real-time data generators to scale intensities, apply structural transformations to protect against overfitting, and split training data with a 20% validation anchor:\n"
         "* **Train Set:** 413 images\n"
         "* **Validation Set:** 103 images\n"
@@ -487,7 +497,7 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown(
-        "#### Deep Learning Core Model Design\n"
+        "#### 🧠 Deep Learning Core Model Design\n"
         "A sequential feature extraction model structured with three cascaded 2D Convolution and Max-Pooling layers, leading to a high-density decision head:"
     )
     st.code(
@@ -502,12 +512,12 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown(
-        "#### Neural Network Training\n"
+        "#### ⚡ Neural Network Training\n"
         "Compiled using the **Adam Optimizer** and evaluated through **Binary Cross-Entropy Loss**. Trained over 10 stable epochs with mini-batch constraints size of 32."
     )
 
     st.markdown("---")
-    st.markdown("### Model Summary & Parameter Footprint")
+    st.markdown("### 📊 Model Summary & Parameter Footprint")
     st.code(
         "Model: \"sequential\"\n"
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓\n"
@@ -530,7 +540,7 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown("---")
-    st.markdown("### Experimental Performance Results")
+    st.markdown("### 📈 Experimental Performance Results")
     st.markdown("#### Classification Report Matrix")
     st.markdown("Evaluated over 129 completely unseen target samples containing distinct categorical classes.")
     st.code(
@@ -552,7 +562,7 @@ elif nav_choice == "ℹ️ About":
     )
 
     st.markdown("---")
-    st.markdown("### Model Deployment & Single-Image Inference")
+    st.markdown("### 🚀 Model Deployment & Single-Image Inference")
     st.markdown("The framework ships with an integrated prediction pipeline to simulate real-world clinical usage. It ingests an un-scanned test matrix, maps internal generator classes dynamically and visualizes a structural verdict complete with confidence weights.")
     st.code(
         "Classes found in test directory: ['YES', 'NO']\n"
@@ -562,7 +572,7 @@ elif nav_choice == "ℹ️ About":
     )
     
     st.markdown("---")
-    st.markdown("### Developer Details")
+    st.markdown("### 👩‍💻 Developer Details")
     st.markdown(
         "* **Name:** Sristi Sarkar\n"
         "* **Contact:**\n"
