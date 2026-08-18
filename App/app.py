@@ -227,7 +227,7 @@ if nav_choice == "🏠 Home":
     st.markdown(
         "<p style='font-size: 1rem; line-height: 1.6;'>"
         "Parkinson's Disease is a progressive neurological disorder that predominantly affects movement and motor control. "
-        "It occurs when dopamine-producing neurons in the brain gradually degenerate, leading to symptoms such as tremors, stiffness, slowed movement, and balance difficulties. "
+        "It occurs when dopamine-producing neurons in the brain gradually degenerate, leading to symptoms such as tremors, stiffness, slowed movement and balance difficulties. "
         "Because symptoms often develop slowly over time, early detection remains one of the greatest challenges in neurology care."
         "</p>", 
         unsafe_allow_html=True
