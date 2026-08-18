@@ -220,81 +220,25 @@ def get_raw_github_url(github_url):
 # PAGE 1: HOME PAGE
 # =========================================================
 if nav_choice == "🏠 Home":
-    st.markdown("### 🚀 Automated Deep Learning Parkinson Detection Engine")
+    st.markdown("### 🧠 Understanding Parkinson's Disease")
     st.markdown(
         "<p style='font-size: 1rem; line-height: 1.6;'>"
-        "✨ Welcome to the advanced medical screening portal! This application utilizes state-of-the-art Deep Computer Vision to instantly analyze and classify "
-        "medical brain scans. Built on top of a custom Sequential Convolutional Neural Network (CNN), the system evaluates visual "
-        "feature representations and leverages intensity range normalizations to output high-precision clinical screening verdicts 🎯."
+        "Parkinson's Disease is a progressive neurological disorder that predominantly affects movement, motor control, and coordination. "
+        "It occurs when dopamine-producing neurons in the brain gradually degenerate, leading to common symptoms such as tremors, stiffness, slowed movement (bradykinesia), and balance difficulties. "
+        "Because symptoms often develop slowly and subtly over time, early and accurate diagnosis remains one of the greatest challenges in neurology care."
         "</p>", 
         unsafe_allow_html=True
     )
-    
-    st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.markdown("### ⚙️ Classification System Architecture & Workflow")
+
+    st.markdown("### 🏥 How Our Platform Helps You")
     st.markdown(
-        "<p style='font-size: 0.95rem; line-height: 1.5;'>"
-        "The classification pipeline is engineered into distinct computational stages designed to maximize diagnostic reliability. "
-        "Every incoming scan undergoes automated dimension normalization, feature extraction via cascaded convolutional layers, "
-        "and probability mapping via dense classification heads to render robust clinical screening output."
+        "<p style='font-size: 1rem; line-height: 1.6;'>"
+        "Our AI-powered screening platform is designed to bridge the gap between advanced deep learning research and accessible healthcare support. "
+        "By utilizing specialized brain scans (DaTscans) which map dopamine transporter activity, our system analyzes spatial image features to instantly assist in screening for Parkinson's Disease. "
+        "Whether you are exploring neurological health indicators or seeking a fast, preliminary second opinion, our application offers an automated, cost-effective, and highly reliable diagnostic tool to support timely medical intervention."
         "</p>",
         unsafe_allow_html=True
     )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown(
-        """
-        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.5); border-radius: 20px; padding: 20px; color: #F8FAFC; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #A5B4FC; margin-bottom: 14px; text-align: center; letter-spacing: 0.5px;">End-to-End Diagnostic Pipeline</div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; font-size: 0.78rem; font-weight: 600;">
-                <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">📥</div>
-                    <div style="color: #C7D2FE; font-weight: 700; margin-bottom: 2px;">1. Preprocessing</div>
-                    <div>Raw images are resized (224x224), normalized, and converted into tensors.</div>
-                </div>
-                <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">⚙️</div>
-                    <div style="color: #DDD6FE; font-weight: 700; margin-bottom: 2px;">2. CNN Inference</div>
-                    <div>Feature extraction via cascaded Conv2D & Max-Pooling layers.</div>
-                </div>
-                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px 8px; border-radius: 12px;">
-                    <div style="font-size: 1.1rem; margin-bottom: 4px;">🎯</div>
-                    <div style="color: #A7F3D0; font-weight: 700; margin-bottom: 2px;">3. Logic & Classification</div>
-                    <div>Sigmoid classification head outputs clinical confidence scores.</div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("### 📊 Visual Workflow Diagram")
-    
-    workflow_html_home = """
-    <div class="workflow-container">
-        <div class="step-title">📥 1. INPUT & IMAGE PREPROCESSING</div>
-        <div class="pill-row">
-            <div class="pill-box-primary"><span>📥 Raw Input Source</span></div>
-            <span class="arrow-separator">→</span>
-            <div class="pill-box-secondary"><span>📐 224x224 Resolution</span></div>
-            <span class="arrow-separator">→</span>
-            <div class="pill-box-secondary"><span>🎛️ Intensity Norm</span></div>
-        </div>
-    </div>
-    <div class="divider-line"><span class="divider-badge">↓</span></div>
-    <div class="workflow-container">
-        <div class="step-title">🧬 2. DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)</div>
-        <div class="pill-row">
-            <div class="pill-box-primary"><span>🧬 Tensor Features</span></div>
-            <span class="arrow-separator">→</span>
-            <div class="pill-box-secondary"><span>⚡ Conv2D Layers</span></div>
-            <span class="arrow-separator">→</span>
-            <div class="pill-box-secondary"><span>📉 Sigmoid Head</span></div>
-        </div>
-    </div>
-    """
-    st.html(workflow_html_home)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.markdown("### ⭐ Core Capabilities Highlight")
@@ -436,14 +380,6 @@ elif nav_choice == "🔮 Prediction":
                     with st.spinner("🧠 Evaluating feature tensors and neural weights..."):
                         pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
 
-                    expected_output_text = "Unknown"
-                    if st.session_state.file_source_name and "sample_" in st.session_state.file_source_name:
-                        sample_num = int(st.session_state.file_source_name.split("_")[1])
-                        if sample_num in [1, 3, 5, 7]:
-                            expected_output_text = "Parkinson Detected (Affected)"
-                        else:
-                            expected_output_text = "Healthy / No Parkinson (Not Affected)"
-
                     if is_positive:
                         st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
                         bar_color = "#EF4444"
@@ -460,9 +396,12 @@ elif nav_choice == "🔮 Prediction":
                     )
                     st.markdown(progress_html, unsafe_allow_html=True)
 
+                    if is_positive:
+                        st.error("⚠️ **Medical Consultation Recommended:** The screening analysis indicates potential signs associated with Parkinson's Disease. Please consult a qualified neurologist or healthcare professional for comprehensive clinical evaluation.")
+                    else:
+                        st.success("🎉 **Congratulations!** The scan analysis indicates a healthy profile with no signs of Parkinson's Disease detected. Maintain a healthy lifestyle and regular wellness checkups.")
+
                     with st.expander("🔬 View Technical Diagnostic Details"):
-                        if st.session_state.file_source_name and "sample_" in st.session_state.file_source_name:
-                            st.write(f"📌 **Expected Output:** `{expected_output_text}`")
                         st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
                         st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
                         st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
@@ -484,6 +423,70 @@ elif nav_choice == "🔮 Prediction":
 # PAGE 3: ABOUT PAGE
 # =========================================================
 elif nav_choice == "ℹ️ About":
+    st.markdown("### ⚙️ Classification System Architecture & Workflow")
+    st.markdown(
+        "<p style='font-size: 0.95rem; line-height: 1.5;'>"
+        "The classification pipeline is engineered into distinct computational stages designed to maximize diagnostic reliability. "
+        "Every incoming scan undergoes automated dimension normalization, feature extraction via cascaded convolutional layers, "
+        "and probability mapping via dense classification heads to render robust clinical screening output."
+        "</p>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.5); border-radius: 20px; padding: 20px; color: #F8FAFC; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #A5B4FC; margin-bottom: 14px; text-align: center; letter-spacing: 0.5px;">End-to-End Diagnostic Pipeline</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; font-size: 0.78rem; font-weight: 600;">
+                <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">📥</div>
+                    <div style="color: #C7D2FE; font-weight: 700; margin-bottom: 2px;">1. Preprocessing</div>
+                    <div>Raw images are resized (224x224), normalized, and converted into tensors.</div>
+                </div>
+                <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">⚙️</div>
+                    <div style="color: #DDD6FE; font-weight: 700; margin-bottom: 2px;">2. CNN Inference</div>
+                    <div>Feature extraction via cascaded Conv2D & Max-Pooling layers.</div>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 12px 8px; border-radius: 12px;">
+                    <div style="font-size: 1.1rem; margin-bottom: 4px;">🎯</div>
+                    <div style="color: #A7F3D0; font-weight: 700; margin-bottom: 2px;">3. Logic & Classification</div>
+                    <div>Sigmoid classification head outputs clinical confidence scores.</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("### 📊 Visual Workflow Diagram")
+    
+    workflow_html_home = """
+    <div class="workflow-container">
+        <div class="step-title">📥 1. INPUT & IMAGE PREPROCESSING</div>
+        <div class="pill-row">
+            <div class="pill-box-primary"><span>📥 Raw Input Source</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>📐 224x224 Resolution</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>🎛️ Intensity Norm</span></div>
+        </div>
+    </div>
+    <div class="divider-line"><span class="divider-badge">↓</span></div>
+    <div class="workflow-container">
+        <div class="step-title">🧬 2. DEEP NEURAL NETWORK (CUSTOM CNN & MAX-POOLING)</div>
+        <div class="pill-row">
+            <div class="pill-box-primary"><span>🧬 Tensor Features</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>⚡ Conv2D Layers</span></div>
+            <span class="arrow-separator">→</span>
+            <div class="pill-box-secondary"><span>📉 Sigmoid Head</span></div>
+        </div>
+    </div>
+    """
+    st.html(workflow_html_home)
+
+    st.markdown("---")
     st.markdown("### 🛠️ Technical Specifications & Architecture")
     st.markdown(
         "✨ An automated deep learning diagnostic pipeline built to evaluate biomarkers from visual cohorts "
