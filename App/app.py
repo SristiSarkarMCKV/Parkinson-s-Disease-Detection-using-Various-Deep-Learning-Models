@@ -205,6 +205,9 @@ if 'selected_sample_url' not in st.session_state:
 def switch_to_prediction():
     st.session_state.nav = '🔮 Prediction'
 
+def switch_to_about():
+    st.session_state.nav = 'ℹ️ About'
+
 nav_choice = st.radio(
     "",
     ["🏠 Home", "🔮 Prediction", "ℹ️ About"],
@@ -223,9 +226,9 @@ if nav_choice == "🏠 Home":
     st.markdown("### 🧠 Understanding Parkinson's Disease")
     st.markdown(
         "<p style='font-size: 1rem; line-height: 1.6;'>"
-        "Parkinson's Disease is a progressive neurological disorder that predominantly affects movement, motor control, and coordination. "
-        "It occurs when dopamine-producing neurons in the brain gradually degenerate, leading to common symptoms such as tremors, stiffness, slowed movement (bradykinesia), and balance difficulties. "
-        "Because symptoms often develop slowly and subtly over time, early and accurate diagnosis remains one of the greatest challenges in neurology care."
+        "Parkinson's Disease is a progressive neurological disorder that predominantly affects movement and motor control. "
+        "It occurs when dopamine-producing neurons in the brain gradually degenerate, leading to symptoms such as tremors, stiffness, slowed movement, and balance difficulties. "
+        "Because symptoms often develop slowly over time, early detection remains one of the greatest challenges in neurology care."
         "</p>", 
         unsafe_allow_html=True
     )
@@ -234,8 +237,8 @@ if nav_choice == "🏠 Home":
     st.markdown(
         "<p style='font-size: 1rem; line-height: 1.6;'>"
         "Our AI-powered screening platform is designed to bridge the gap between advanced deep learning research and accessible healthcare support. "
-        "By utilizing specialized brain scans (DaTscans) which map dopamine transporter activity, our system analyzes spatial image features to instantly assist in screening for Parkinson's Disease. "
-        "Whether you are exploring neurological health indicators or seeking a fast, preliminary second opinion, our application offers an automated, cost-effective, and highly reliable diagnostic tool to support timely medical intervention."
+        "By utilizing specialized DaTscan images, our system analyzes spatial image features to instantly assist in screening for Parkinson's Disease. "
+        "Whether you are exploring neurological health indicators or seeking a preliminary second opinion, our application offers an automated and reliable diagnostic tool to support timely medical intervention."
         "</p>",
         unsafe_allow_html=True
     )
@@ -253,7 +256,11 @@ if nav_choice == "🏠 Home":
         st.markdown('<div class="feature-card" style="border-left-color: #EC4899;"><div class="feature-card-title">🛡️ Smart Filtering</div><div class="feature-card-desc">Robust validation logic ensuring precise medical scan inputs before executing neural inference.</div></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
-    st.button("🚀 Launch Image Classifier Engine", on_click=switch_to_prediction)
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        st.button("🚀 Launch Image Classifier Engine", on_click=switch_to_prediction)
+    with col_btn2:
+        st.button("ℹ️ Know More About Technical Architecture", on_click=switch_to_about)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
@@ -381,10 +388,10 @@ elif nav_choice == "🔮 Prediction":
                         pred_class, score, is_positive = classify_parkinsons_image(image, st.session_state.file_source_name)
 
                     if is_positive:
-                        st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: {pred_class}</p></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="result-card result-positive"><p class="card-title">⚠️ Status: Parkinson Detected</p></div>', unsafe_allow_html=True)
                         bar_color = "#EF4444"
                     else:
-                        st.markdown(f'<div class="result-card result-healthy"><p class="card-title">✅ Status: {pred_class}</p></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="result-card result-healthy"><p class="card-title">✅ Status: Healthy / No Parkinson</p></div>', unsafe_allow_html=True)
                         bar_color = "#10B981"
 
                     st.metric(label="🎯 Confidence Score", value=f"{score:.2f}%")
@@ -402,7 +409,6 @@ elif nav_choice == "🔮 Prediction":
                         st.success("🎉 **Congratulations!** The scan analysis indicates a healthy profile with no signs of Parkinson's Disease detected. Maintain a healthy lifestyle and regular wellness checkups.")
 
                     with st.expander("🔬 View Technical Diagnostic Details"):
-                        st.write(f"🏷️ **Classification Verdict:** `{pred_class}`")
                         st.write(f"🏷️ **Confidence Metrics:** `{score:.2f}%`")
                         st.write("🧠 **Architecture:** Sequential CNN (3x Conv2D + MaxPooling + Dense)")
                         st.write("⚙️ **Tensor Normalization:** Scale factor 1/224.0 with Sigmoid activation head")
